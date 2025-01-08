@@ -7,7 +7,7 @@ type SignUpInButton  ={
 
 const SignUpInButton = ({ children, route } : SignUpInButton) => {
   return (
-    <Link to={`/${route}`} className="bg-red-800 rounded text-xl px-4 py-2 mx-4 border-4 border-transparent hover:border-black hover:text-black">
+    <Link to={`/${route}`} className="bg-red-800 rounded text-xl px-4 py-2 mx-4 border-4 border-transparent md:text-2xl hover:border-black hover:text-black">
           {children}
         </Link>
   )
