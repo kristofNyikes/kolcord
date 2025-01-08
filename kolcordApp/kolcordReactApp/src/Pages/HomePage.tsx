@@ -9,10 +9,10 @@ const HomePage = () => {
         <p className='text-lg lg:text-xl'>Already signed up? Just hit the Log In button!</p>
       </div>
       <div className="m-4">
-        <SignUpInButton>
+        <SignUpInButton route='register'>
           Sign Up!
         </SignUpInButton>
-        <SignUpInButton>
+        <SignUpInButton route='login'>
           Log In!
         </SignUpInButton>
       </div>
