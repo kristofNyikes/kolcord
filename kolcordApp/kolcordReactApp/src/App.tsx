@@ -3,7 +3,7 @@ import Logo from './Components/Logo/Logo';
 
 function App() {
   return (
-    <div className='bg-gradient-to-b from-red-950 to-stone-950 min-h-screen text-white'>
+    <div className='bg-gradient-to-t from-red-950 via-stone-950 to-red-950 min-h-screen text-white'>
       <Logo/>
       <Outlet />
     </div>
