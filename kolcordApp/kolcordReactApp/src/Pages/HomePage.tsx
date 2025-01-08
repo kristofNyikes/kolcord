@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import SignUpInButton from '../Components/Buttons/SignUpInButton';
 
 const HomePage = () => {
   return (
@@ -9,12 +9,12 @@ const HomePage = () => {
         <h3>Sign up or Log in</h3>
       </div>
       <div className="m-4">
-        <Link to="/register" className="bg-red-800 text-black border-4 border-black rounded px-4 py-2 mx-4">
+        <SignUpInButton>
           Sign Up!
-        </Link>
-        <Link to="/login" className="bg-red-800 text-gray-100 rounded px-4 py-2 mx-4">
-          Log in!
-        </Link>
+        </SignUpInButton>
+        <SignUpInButton>
+          Log In!
+        </SignUpInButton>
       </div>
     </div>
   );
