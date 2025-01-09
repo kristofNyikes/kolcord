@@ -3,6 +3,8 @@ using kolcordWebApi.Interfaces;
 using kolcordWebApi.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Cryptography;
+using Microsoft.EntityFrameworkCore;
 
 namespace kolcordWebApi.Controllers;
 
@@ -35,8 +37,10 @@ public class AccountController : ControllerBase
             {
                 UserName = registerDto.Username,
                 Email = registerDto.Email,
+                RefreshToken = GenerateRefreshToken(),
+                RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(30)
             };
-
+            
             var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password!);
 
             if (createdUser.Succeeded)
@@ -46,8 +50,8 @@ public class AccountController : ControllerBase
                 {
                     return Ok(new NewUserDto
                     {
-                        UserName = appUser.UserName,
-                        Email = appUser.Email,
+                        UserName = appUser.UserName!,
+                        Email = appUser.Email!,
                         Token = _tokenService.CreateToken(appUser)
                     });
                 }
@@ -65,6 +69,35 @@ public class AccountController : ControllerBase
         {
             Console.WriteLine(e);
             throw;
+        }
+    }
+
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
+    {
+        var user = await _userManager.Users.SingleOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+        {
+            return Unauthorized("Invalid or expired token");
+        }
+        
+        var newAccessToken = _tokenService.CreateToken(user);
+        var newRefreshToken = GenerateRefreshToken();
+        
+        user.RefreshToken = newAccessToken;
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(30);
+        await _userManager.UpdateAsync(user);
+
+        return Ok(new RefreshTokenDto { AccessToken = newAccessToken, RefreshToken = newRefreshToken });
+    }
+
+    private string GenerateRefreshToken()
+    {
+        var randomNumber = new byte[32];
+        using (var rng = RandomNumberGenerator.Create())
+        {
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
         }
     }
 }
