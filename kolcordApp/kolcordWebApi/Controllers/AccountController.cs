@@ -1,9 +1,11 @@
-﻿using kolcordWebApi.Dtos.Account;
+﻿using System.Security.Claims;
+using kolcordWebApi.Dtos.Account;
 using kolcordWebApi.Interfaces;
 using kolcordWebApi.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace kolcordWebApi.Controllers;
@@ -94,7 +96,6 @@ public class AccountController : ControllerBase
             return Unauthorized("Email or password is incorrect");
         }
         
-        var accessToken = _tokenService.CreateToken(user);
         var refreshToken = GenerateRefreshToken();
         
         user.RefreshToken = refreshToken;
@@ -109,10 +110,27 @@ public class AccountController : ControllerBase
             RefreshToken = refreshToken
         });
     }
-    
-    
+
+    [HttpPost("logout")]
+    [Authorize]
+    public async Task<IActionResult> Logout()
+    {
+        var user = await _userManager.GetUserAsync(User);
+
+        if (user == null)
+        {
+            return Unauthorized("user manager is null");
+        }
+
+        user.RefreshToken = null;
+        user.RefreshTokenExpiryTime = DateTime.UtcNow;
+        await _userManager.UpdateAsync(user);
+        
+        return Ok(new {Message  = "Logged out successfully"});
+    }
 
     [HttpPost("refresh-token")]
+    [Authorize]
     public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
     {
         var user = await _userManager.Users.SingleOrDefaultAsync(u => u.RefreshToken == refreshToken);
@@ -124,7 +142,7 @@ public class AccountController : ControllerBase
         var newAccessToken = _tokenService.CreateToken(user);
         var newRefreshToken = GenerateRefreshToken();
         
-        user.RefreshToken = newAccessToken;
+        user.RefreshToken = newRefreshToken;
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(30);
         await _userManager.UpdateAsync(user);
 
