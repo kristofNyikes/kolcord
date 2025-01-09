@@ -52,7 +52,8 @@ public class AccountController : ControllerBase
                     {
                         UserName = appUser.UserName!,
                         Email = appUser.Email!,
-                        Token = _tokenService.CreateToken(appUser)
+                        Token = _tokenService.CreateToken(appUser),
+                        RefreshToken = appUser.RefreshToken
                     });
                 }
                 else
@@ -71,6 +72,45 @@ public class AccountController : ControllerBase
             throw;
         }
     }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginReq loginReq)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        
+        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == loginReq.Email);
+        if (user == null)
+        {
+            return Unauthorized("Invalid username or password");
+        }
+        
+        var result = await _sigInManager.PasswordSignInAsync(user, loginReq.Password, false, false);
+
+        if (!result.Succeeded)
+        {
+            return Unauthorized("Email or password is incorrect");
+        }
+        
+        var accessToken = _tokenService.CreateToken(user);
+        var refreshToken = GenerateRefreshToken();
+        
+        user.RefreshToken = refreshToken;
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(30);
+        await _userManager.UpdateAsync(user);
+
+        return Ok(new NewUserDto
+        {
+            UserName = user.UserName!,
+            Email = user.Email!,
+            Token = _tokenService.CreateToken(user),
+            RefreshToken = refreshToken
+        });
+    }
+    
+    
 
     [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
