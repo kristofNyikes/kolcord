@@ -95,7 +95,7 @@ app.UseCors(x => x
     .AllowAnyMethod()
     .AllowAnyHeader()
     .AllowCredentials()
-    .SetIsOriginAllowed(optins => true));
+    .SetIsOriginAllowed(options => true));
 
 app.UseAuthentication();
 app.UseAuthorization();
