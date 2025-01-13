@@ -1,10 +1,8 @@
 import { jwtDecode } from 'jwt-decode';
 
 type Data = {
-  accessToken: string;
+  token: string;
   refreshToken: string;
-  userName: string;
-  email: string;
 };
 
 const isTokenExpiringSoon = (token: string | null): boolean => {
@@ -27,9 +25,9 @@ export const fetchWithTokenCheck = async (url: string, options: any): Promise<Re
 
     if (response.ok) {
       const data: Data = await response.json();
-      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('accessToken', data.token);
       localStorage.setItem('refreshToken', data.refreshToken);
-      accessToken = data.accessToken;
+      accessToken = data.token;
     } else {
       throw new Error('Session expired. Please log in again.');
     }
