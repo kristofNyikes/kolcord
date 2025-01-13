@@ -130,13 +130,13 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("refresh-token")]
-    [Authorize]
-    public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest refreshToken)
     {
-        var user = await _userManager.Users.SingleOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        Console.WriteLine(refreshToken);
+        var user = await _userManager.Users.SingleOrDefaultAsync(u => u.RefreshToken == refreshToken.RefreshToken);
         if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
         {
-            return Unauthorized("Invalid or expired token");
+            return Unauthorized();
         }
         
         var newAccessToken = _tokenService.CreateToken(user);
@@ -147,6 +147,19 @@ public class AccountController : ControllerBase
         await _userManager.UpdateAsync(user);
 
         return Ok(new RefreshTokenDto { AccessToken = newAccessToken, RefreshToken = newRefreshToken });
+    }
+
+    [HttpGet("refresh-token-expiration")]
+    [Authorize]
+    public async Task<IActionResult> GetExpirationDate()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        return Ok(new {Expiration = user.RefreshTokenExpiryTime });
     }
 
     private string GenerateRefreshToken()
