@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 type Data = {
   userName: string;
   email: string;
-  token: string;
+  accessToken: string;
   refreshToken: string;
 }
 
@@ -40,7 +40,7 @@ const RegisterPage = () => {
         const data: Data = await response.json();
         localStorage.setItem('userName', data.userName);
         localStorage.setItem('email', data.email);
-        localStorage.setItem('accessToken', data.token);
+        localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
         navigate("/main")
       }

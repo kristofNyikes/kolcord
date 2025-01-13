@@ -36,6 +36,7 @@ const LoginPage = () => {
       const response = await fetch(`${baseUrl}/api/account/login`, options)
       if(response.ok) {
         const data: Data = await response.json();
+        console.table(data);
         localStorage.setItem('userName', data.userName);
         localStorage.setItem('email', data.email);
         localStorage.setItem('accessToken', data.token);
