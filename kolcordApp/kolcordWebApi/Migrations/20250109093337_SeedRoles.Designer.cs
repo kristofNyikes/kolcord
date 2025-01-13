@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using kolcordWebApi.Data;
@@ -11,9 +12,11 @@ using kolcordWebApi.Data;
 namespace kolcordWebApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250109093337_SeedRoles")]
+    partial class SeedRoles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,13 +53,13 @@ namespace kolcordWebApi.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "2fd0e334-8b9a-4837-bd66-b8c396cec849",
+                            Id = "adf27bb6-98dd-4c5f-a313-88986fccbbcf",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "305379d1-c07c-453e-aef7-bbeb61338f38",
+                            Id = "75674c91-32ec-4d04-89cf-490d9c6043ee",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -236,12 +239,6 @@ namespace kolcordWebApi.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("RefreshToken")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("RefreshTokenExpiryTime")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
