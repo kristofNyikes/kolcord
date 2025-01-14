@@ -10,6 +10,10 @@ public class ApplicationUser : IdentityUser
     [StringLength(500, ErrorMessage = "Bio length cannot be more then 500 characters")]
     public string Bio { get; set; } = string.Empty;
 
+    public string NickName { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public string Gender { get; set; }
+
     public string? RefreshToken { get; set; }
     public DateTime RefreshTokenExpiryTime { get; set; }
 

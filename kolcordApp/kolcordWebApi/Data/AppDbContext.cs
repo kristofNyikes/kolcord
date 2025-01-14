@@ -83,6 +83,18 @@ namespace kolcordWebApi.Data
                 .HasMany(r => r.Members)
                 .WithMany(sm => sm.Roles);
 
+            modelBuilder.Entity<FriendRequest>()
+                .HasOne(fr => fr.Sender)
+                .WithMany()
+                .HasForeignKey(fr => fr.SenderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<FriendRequest>()
+                .HasOne(fr => fr.Receiver)
+                .WithMany()
+                .HasForeignKey(fr => fr.ReceiverId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             List<IdentityRole> roles = new List<IdentityRole>
             {
                 new IdentityRole
