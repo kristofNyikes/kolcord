@@ -3,6 +3,7 @@ using kolcordWebApi.Interfaces;
 using kolcordWebApi.Models;
 using kolcordWebApi.Models.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace kolcordWebApi.Repository;
 
@@ -45,6 +46,10 @@ public class UserRepository : IUserRepository
                 CreatedAt = DateTime.UtcNow,
             },
         };
+        var exists = await _context.Friendships.AnyAsync(f => (f.UserId == user.Id && f.FriendId == friend.Id) || (f.UserId == friend.Id && f.FriendId == user.Id));
+
+        if (exists) return null;
+
         await _context.Friendships.AddRangeAsync(friendships);
         await _context.SaveChangesAsync();
         return friendships;
@@ -52,11 +57,16 @@ public class UserRepository : IUserRepository
 
     public async Task<FriendRequest?> SendFriendRequest(ApplicationUser sender, string receiverName)
     {
+        
         var receiver = await GetByName(receiverName);
         if (receiver == null)
         {
             return null;
         }
+
+        var exists = await _context.Friendships.AnyAsync(f => (f.UserId == sender.Id && f.FriendId == receiver.Id) || (f.UserId == receiver.Id && f.FriendId == sender.Id));
+
+        if(exists) return null;
 
         var friendRequest = new FriendRequest
         {
@@ -84,7 +94,12 @@ public class UserRepository : IUserRepository
         var receiver = await _context.Users.FindAsync(request.ReceiverId);
         if (sender != null && receiver != null)
         {
-            await AddFriend(sender, receiver.UserName!);
+            var result = await AddFriend(sender, receiver.UserName!);
+
+            if (result == null)
+            {
+                return false;
+            }
         }
 
         return true;
@@ -92,6 +107,21 @@ public class UserRepository : IUserRepository
 
     public async Task<bool> RejectFriendRequest(int requestId)
     {
+        var request = await _context.FriendRequests.FindAsync(requestId);
+        if (request == null || request.FriendRequestStatus != FriendRequestStatus.Pending)
+        {
+            return false;
+        }
+
+        request.FriendRequestStatus = FriendRequestStatus.Rejected;
+        await _context.SaveChangesAsync();
+
         return true;
+    }
+
+    public async Task<List<Friendship>?> GetFriendships(ApplicationUser user)
+    {
+        var friends = await _context.Friendships.Where(f => f.UserId == user.Id).Include(f => f.Friend).ToListAsync();
+        return friends;
     }
 }

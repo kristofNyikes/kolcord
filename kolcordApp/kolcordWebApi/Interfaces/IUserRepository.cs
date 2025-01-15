@@ -10,4 +10,5 @@ public interface IUserRepository
     public Task<FriendRequest?> SendFriendRequest(ApplicationUser sender, string receiverName);
     public Task<bool> AcceptFriendRequest(int requestId);
     public Task<bool> RejectFriendRequest(int requestId);
+    public Task<List<Friendship>?> GetFriendships(ApplicationUser user);
 }
