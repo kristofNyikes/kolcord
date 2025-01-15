@@ -15,6 +15,7 @@ namespace kolcordWebApi.Data
         public DbSet<Message> Messages { get; set; }
         public DbSet<Channel> Channels { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<FriendRequest> FriendRequests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
