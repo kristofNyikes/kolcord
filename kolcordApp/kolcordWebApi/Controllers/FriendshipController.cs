@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace kolcordWebApi.Controllers;
 
+[Route("api/friendship")]
+[ApiController]
 public class FriendshipController : ControllerBase
 {
     private readonly IFriendshipRepository _friendshipRepo;
