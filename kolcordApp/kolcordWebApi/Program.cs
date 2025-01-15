@@ -81,6 +81,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IFriendshipRepository, FriendshipRepository>();
 
 var app = builder.Build();
 
