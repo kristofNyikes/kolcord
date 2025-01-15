@@ -21,20 +21,18 @@ namespace kolcordWebApi.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure ServerMember composite key
             modelBuilder.Entity<ServerMember>()
                 .HasKey(sm => new { sm.UserId, sm.ServerId });
 
-            // Configure relationships
             modelBuilder.Entity<Server>()
                 .HasOne(s => s.Owner)
-                .WithMany(u => u.OwnedServers) // Use OwnedServers here
+                .WithMany(u => u.OwnedServers) 
                 .HasForeignKey(s => s.OwnerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<ServerMember>()
                 .HasOne(sm => sm.User)
-                .WithMany(u => u.ServerMemberships) // Use ServerMemberships here
+                .WithMany(u => u.ServerMemberships)
                 .HasForeignKey(sm => sm.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
