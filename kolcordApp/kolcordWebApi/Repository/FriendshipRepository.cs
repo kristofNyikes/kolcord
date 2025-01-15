@@ -79,10 +79,15 @@ public class FriendshipRepository : IFriendshipRepository
         return friendRequest;
     }
 
-    public async Task<bool> AcceptFriendRequest(int requestId)
+    public async Task<bool> AcceptFriendRequest(int requestId, ApplicationUser user)
     {
         var request = await _context.FriendRequests.FindAsync(requestId);
         if (request == null || request.FriendRequestStatus != FriendRequestStatus.Pending)
+        {
+            return false;
+        }
+
+        if (request.ReceiverId != user.Id)
         {
             return false;
         }
@@ -105,10 +110,15 @@ public class FriendshipRepository : IFriendshipRepository
         return true;
     }
 
-    public async Task<bool> RejectFriendRequest(int requestId)
+    public async Task<bool> RejectFriendRequest(int requestId, ApplicationUser user)
     {
         var request = await _context.FriendRequests.FindAsync(requestId);
         if (request == null || request.FriendRequestStatus != FriendRequestStatus.Pending)
+        {
+            return false;
+        }
+
+        if (request.ReceiverId != user.Id)
         {
             return false;
         }

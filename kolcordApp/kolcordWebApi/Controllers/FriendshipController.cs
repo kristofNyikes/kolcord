@@ -70,7 +70,7 @@ public class FriendshipController : ControllerBase
             return Unauthorized("Sign in to accept friend request");
         }
 
-        var success = await _friendshipRepo.AcceptFriendRequest(requestId);
+        var success = await _friendshipRepo.AcceptFriendRequest(requestId, user);
         if (!success)
         {
             return BadRequest("Friend request could not be accepted");
@@ -89,7 +89,7 @@ public class FriendshipController : ControllerBase
             return Unauthorized("Sign in to reject friend request");
         }
 
-        var success = await _friendshipRepo.RejectFriendRequest(requestId);
+        var success = await _friendshipRepo.RejectFriendRequest(requestId, user);
         if (!success)
         {
             return NotFound("Friend request could not be rejected");
