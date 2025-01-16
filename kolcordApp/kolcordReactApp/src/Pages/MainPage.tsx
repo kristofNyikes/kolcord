@@ -1,5 +1,7 @@
+import FriendList from '../Components/Friends/FriendList';
+
 const MainPage = () => {
-  return <div>MainPage</div>;
+  return (<FriendList/>)
 };
 
 export default MainPage;
