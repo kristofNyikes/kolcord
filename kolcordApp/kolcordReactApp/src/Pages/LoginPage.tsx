@@ -1,7 +1,9 @@
 import InputField from '../Components/InputField/InputField';
 import SubmitButton from '../Components/Buttons/SubmitButton';
 import { useNavigate } from 'react-router';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { Context } from '../Components/Contexts/Context';
+// import LoginError from '../Components/Errors/LoginError';
 
 type Data = {
   userName: string;
@@ -13,6 +15,13 @@ type Data = {
 const LoginPage = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const context = useContext(Context);
+
+  if(!context){
+    throw new Error('Context must be used within a Context.Provider');
+  }
+  
+  const [, setSignedIn] = context;
   const navigate = useNavigate();
 
   const body = {
@@ -32,17 +41,16 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const baseUrl = import.meta.env.VITE_BASE_URL;
-      console.log( baseUrl)
       const response = await fetch(`${baseUrl}/api/account/login`, options)
       if(response.ok) {
         const data: Data = await response.json();
-        console.table(data);
         localStorage.setItem('userName', data.userName);
         localStorage.setItem('email', data.email);
         localStorage.setItem('accessToken', data.token);
         localStorage.setItem('refreshToken', data.refreshToken);
+        setSignedIn(true);
         navigate("/main")
-      }
+      } 
     } catch (error) {
       console.error(error);
     }
@@ -58,6 +66,7 @@ const LoginPage = () => {
         <InputField inputValue={password} inputState={setPassword} type="password">
           Pasword:{' '}
         </InputField>
+        {/* {error && <LoginError message={errorMessage} errorArr={errorArray}></LoginError>} */}
         <SubmitButton>Submit</SubmitButton>
       </form>
     </div>
