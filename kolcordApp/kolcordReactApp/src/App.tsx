@@ -1,5 +1,5 @@
 import { Context } from './Components/Contexts/Context';
-import { Outlet } from 'react-router';
+import { Outlet, useNavigate } from 'react-router';
 import Logo from './Components/Logo/Logo';
 import { useEffect, useState } from 'react';
 
@@ -7,11 +7,16 @@ function App() {
   const [signedIn, setSignedIn] = useState<boolean>(() => {
     return !!localStorage.getItem('accessToken');
   });
-
+  const navigate = useNavigate();
   useEffect(() => {
     if(signedIn) {
       const token = localStorage.getItem('accessToken');
-      if(!token) setSignedIn(false);
+
+      if(!token) {
+        setSignedIn(false);
+        navigate('/');
+      }
+      navigate('/main');
     }
   }, [])
 
