@@ -30,11 +30,13 @@ const FriendList = () => {
 
   return (
     <div>
-      {friendList && friendList.length > 0
-        ? friendList.map((f) => {
-            return <FriendItem friend={f.friendDto} key={f.id} />;
-          })
-        : 'no friends lol'}
+      <div className="bg-black/35 p-2 h-screen w-screen">
+        {friendList && friendList.length > 0
+          ? friendList.map((f) => {
+              return <FriendItem friend={f.friendDto} key={f.id} />;
+            })
+          : 'no friends lol'}
+      </div>
     </div>
   );
 };
