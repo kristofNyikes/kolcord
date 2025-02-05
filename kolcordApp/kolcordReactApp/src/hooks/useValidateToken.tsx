@@ -9,24 +9,24 @@ export const useValidateToken = () => {
   useEffect(() => {
     const validateToken = async () => {
       try {
-        console.log('refresh-token before', localStorage.getItem('refreshToken'));
         const response = await fetchWithTokenCheck('/api/account/refresh-token-expiration', {});
         if (response.ok) {
-          console.log('refresh-token AFTER', localStorage.getItem('refreshToken'));
           const data = await response.json();
           const expiration = new Date(data.expiration).getTime() / constants.secInMiliSec;
           const now = Math.floor(Date.now() / constants.secInMiliSec);
 
           if (expiration < now) {
             navigate('/login');
+            localStorage.clear();
           }
         } else if (response.status === 401) {
           navigate('/login');
+          localStorage.clear();
         }
       } catch (error) {
-        console.log('refresh-token ERROR', localStorage.getItem('refreshToken'));
         console.error('Token validation failed:', error);
         navigate('/login');
+        localStorage.clear();
       }
     };
 

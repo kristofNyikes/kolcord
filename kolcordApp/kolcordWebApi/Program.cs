@@ -2,6 +2,7 @@ using System.Text;
 using kolcordWebApi.Data;
 using kolcordWebApi.Interfaces;
 using kolcordWebApi.Models;
+using kolcordWebApi.Repository;
 using kolcordWebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -79,6 +80,8 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IFriendshipRepository, FriendshipRepository>();
 
 var app = builder.Build();
 

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using kolcordWebApi.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace kolcordWebApi.Models;
 

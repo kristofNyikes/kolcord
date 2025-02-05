@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import InputField from '../Components/InputField/InputField';
 import SubmitButton from '../Components/Buttons/SubmitButton';
 import { Link, useNavigate } from 'react-router-dom';
+import { Context } from '../Components/Contexts/Context';
 
 type Data = {
   userName: string;
@@ -14,7 +15,14 @@ const RegisterPage = () => {
   const [username, setUsername] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const context = useContext(Context);
   const navigate = useNavigate();
+
+  if(!context){
+    throw new Error('Context must be used within a Context.Provider');
+  }
+
+  const [, setSignedIn] = context;
 
   const body = {
     email: email,
@@ -42,6 +50,7 @@ const RegisterPage = () => {
         localStorage.setItem('email', data.email);
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
+        setSignedIn(true);
         navigate("/main")
       }
     } catch (error) {

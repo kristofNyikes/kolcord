@@ -15,25 +15,24 @@ namespace kolcordWebApi.Data
         public DbSet<Message> Messages { get; set; }
         public DbSet<Channel> Channels { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<FriendRequest> FriendRequests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure ServerMember composite key
             modelBuilder.Entity<ServerMember>()
                 .HasKey(sm => new { sm.UserId, sm.ServerId });
 
-            // Configure relationships
             modelBuilder.Entity<Server>()
                 .HasOne(s => s.Owner)
-                .WithMany(u => u.OwnedServers) // Use OwnedServers here
+                .WithMany(u => u.OwnedServers) 
                 .HasForeignKey(s => s.OwnerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<ServerMember>()
                 .HasOne(sm => sm.User)
-                .WithMany(u => u.ServerMemberships) // Use ServerMemberships here
+                .WithMany(u => u.ServerMemberships)
                 .HasForeignKey(sm => sm.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -82,6 +81,18 @@ namespace kolcordWebApi.Data
             modelBuilder.Entity<Role>()
                 .HasMany(r => r.Members)
                 .WithMany(sm => sm.Roles);
+
+            modelBuilder.Entity<FriendRequest>()
+                .HasOne(fr => fr.Sender)
+                .WithMany()
+                .HasForeignKey(fr => fr.SenderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<FriendRequest>()
+                .HasOne(fr => fr.Receiver)
+                .WithMany()
+                .HasForeignKey(fr => fr.ReceiverId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             List<IdentityRole> roles = new List<IdentityRole>
             {

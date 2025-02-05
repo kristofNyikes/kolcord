@@ -1,4 +1,4 @@
-﻿namespace kolcordWebApi.Models;
+﻿namespace kolcordWebApi.Models.Enums;
 
 public enum ChannelType
 {
