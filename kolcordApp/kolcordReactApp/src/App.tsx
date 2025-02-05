@@ -11,22 +11,21 @@ function App() {
   useEffect(() => {
     if(signedIn) {
       const token = localStorage.getItem('accessToken');
-
       if(!token) {
         setSignedIn(false);
+        localStorage.clear();
         navigate('/');
       }
       navigate('/main');
     }
   }, [])
 
-  const route = signedIn ? '/main' : '/';
+  const route = '/'
 
   return (
     <Context.Provider value={[signedIn, setSignedIn]}>
-      <div className="bg-gradient-to-t from-red-950 via-stone-950 to-red-950 min-h-screen text-white font-oswald pt-3">
-        <Logo route={route} />
-        <div>{signedIn ? <p>signed in</p> : <p>not signed in</p>}</div>
+      <div className="bg-gradient-to-t from-red-950 via-stone-950 to-red-950 min-h-screen text-white font-oswald">
+        {!signedIn && <Logo route={route} />}
         <Outlet />
       </div>
     </Context.Provider>
