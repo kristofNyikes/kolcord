@@ -66,7 +66,6 @@ const LoginPage = () => {
         <InputField inputValue={password} inputState={setPassword} type="password">
           Pasword:{' '}
         </InputField>
-        {/* {error && <LoginError message={errorMessage} errorArr={errorArray}></LoginError>} */}
         <SubmitButton>Submit</SubmitButton>
       </form>
     </div>
