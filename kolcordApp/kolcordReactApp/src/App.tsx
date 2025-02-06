@@ -9,16 +9,13 @@ function App() {
   });
   const navigate = useNavigate();
   useEffect(() => {
-    if (signedIn) {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        setSignedIn(false);
-        localStorage.clear();
-        navigate('/');
-      } else {
-        navigate('/main');
-      }
+    const token = localStorage.getItem('accessToken');
+
+    if (token) {
+      setSignedIn(true);
+      navigate('/main');
     } else {
+      setSignedIn(false);
       navigate('/');
     }
   }, [signedIn, navigate]);

@@ -17,13 +17,16 @@ type FriendDto = {
 
 const FriendList = () => {
   const [friendList, setFriendList] = useState<Friend[] | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchFriends = async () => {
       const response = await fetchWithTokenCheck('/api/friendship/friend-list', {});
+      setIsLoading(true);
       if (response.ok) {
         const data = await response.json();
         setFriendList(data);
+        setIsLoading(false);
       }
     };
     fetchFriends();
@@ -35,7 +38,7 @@ const FriendList = () => {
         ? friendList.map((f) => {
             return <FriendItem friend={f.friendDto} key={f.id} />;
           })
-        : <Spinner/>}
+        : isLoading ? <Spinner/> : <p>No friends</p>}
     </div>
   );
 };

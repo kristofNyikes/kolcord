@@ -7,7 +7,7 @@ import { Context } from '../Contexts/Context';
 
 const TopBar: React.FC = () => {
   const { friendRequests } = useFriendRequests();
-  const [signedIn, setSignedIn] = useContext(Context);
+  const [, setSignedIn] = useContext(Context);
   const navigate = useNavigate();
 
   const options = {
