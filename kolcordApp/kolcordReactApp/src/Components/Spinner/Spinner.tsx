@@ -1,12 +1,12 @@
 import React from 'react';
 
 type Prop = {
-  size?: number; // Optional size prop (default: 20)
-  color?: string; // Optional color prop (default: #212121)
-  animationSpeed?: number; // Optional animation speed in seconds (default: 1)
+  size?: number;
+  color?: string;
+  animationSpeed?: number;
 };
 
-const Spinner: React.FC<Prop> = ({ size = 20, color = '#212121', animationSpeed = 2 }) => {
+const Spinner: React.FC<Prop> = ({ size = 20, color = '#212121', animationSpeed = 3 }) => {
   const animationStyle = {
     animation: `spin ${animationSpeed}s linear infinite`
   };
@@ -14,6 +14,7 @@ const Spinner: React.FC<Prop> = ({ size = 20, color = '#212121', animationSpeed 
   return (
     <div>
       <svg
+        className='animate-spin'
         height={size}
         width={size} 
         viewBox="0 0 16 16"

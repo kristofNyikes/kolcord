@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import FriendItem from './FriendItem';
 import { fetchWithTokenCheck } from '../../Helpers/fetchWithTokenRefresh';
+import Spinner from '../Spinner/Spinner';
 
 type Friend = {
   id: number;
@@ -29,12 +30,12 @@ const FriendList = () => {
   }, []);
 
   return (
-    <div>
+    <div className='flex flex-col items-center'>
       {friendList && friendList.length > 0
         ? friendList.map((f) => {
             return <FriendItem friend={f.friendDto} key={f.id} />;
           })
-        : 'no friends lol'}
+        : <Spinner/>}
     </div>
   );
 };

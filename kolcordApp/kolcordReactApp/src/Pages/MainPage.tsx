@@ -28,7 +28,7 @@ const MainPage = () => {
           <div className="w-16 flex-none overflow-y-auto">
             <ServerList />
           </div>
-          <div className="flex-grow bg-black/35 p-2 h-screen w-screen">
+          <div className="flex-grow bg-black/35 h-screen w-screen">
             <Outlet context={friendRequests} />
           </div>
         </div>

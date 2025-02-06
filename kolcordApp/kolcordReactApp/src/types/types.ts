@@ -10,6 +10,7 @@ export type FriendDto = {
   bio: string;
   userName: string;
 };
-export type Sender = {
-  sender: FriendDto
+export type FriendRequestItemProp = {
+  request: Requests
+  removeRequest (): void;
 }

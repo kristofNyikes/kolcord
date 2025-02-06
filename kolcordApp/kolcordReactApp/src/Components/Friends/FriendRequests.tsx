@@ -10,7 +10,7 @@ const FriendRequests: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className='flex flex-col items-center'>
       {friendRequests && friendRequests?.length > 0 ? 
         friendRequests.map(req => {
           return <FriendRequestItem key={req.id} request={req} removeRequest={removeRequest}/>
