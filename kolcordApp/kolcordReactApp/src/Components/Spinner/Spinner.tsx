@@ -1,12 +1,9 @@
 import React from 'react';
+import { SpinnerProp } from '../../types/types';
 
-type Prop = {
-  size?: number;
-  color?: string;
-  animationSpeed?: number;
-};
 
-const Spinner: React.FC<Prop> = ({ size = 20, color = '#212121', animationSpeed = 3 }) => {
+
+const Spinner: React.FC<SpinnerProp> = ({ size = 20, color = '#212121', animationSpeed = 3 }) => {
   const animationStyle = {
     animation: `spin ${animationSpeed}s linear infinite`
   };

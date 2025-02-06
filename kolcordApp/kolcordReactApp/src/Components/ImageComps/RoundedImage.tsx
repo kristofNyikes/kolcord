@@ -1,9 +1,6 @@
-type Props = {
-  src: string
-  size: '8' | '11' | '32'
-}
+import { RoundImageProps } from '../../types/types';
 
-const RoundedImage: React.FC<Props> = ({src, size}) => {
+const RoundedImage: React.FC<RoundImageProps> = ({src, size}) => {
   const sizeList = {
     '8': 'size-8',
     '11': 'size-11',

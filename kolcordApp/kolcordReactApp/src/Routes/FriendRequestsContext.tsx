@@ -1,12 +1,8 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Requests } from '../types/types';
+import { FriendRequestsContextType, Requests } from '../types/types';
 import { fetchWithTokenCheck } from '../Helpers/fetchWithTokenRefresh';
 
-type FriendRequestsContextType = {
-  friendRequests: Requests[] | null;
-  refetchFriendRequests: () => void;
-};
 
 const FriendRequestsContext = createContext<FriendRequestsContextType | null>(null);
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import FriendItem from './FriendItem';
 import { fetchWithTokenCheck } from '../../Helpers/fetchWithTokenRefresh';
 import Spinner from '../Spinner/Spinner';
+import FriendItem from './FriendItem';
 
 type Friend = {
   id: number;

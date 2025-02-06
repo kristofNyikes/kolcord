@@ -4,13 +4,8 @@ import SubmitButton from '../Components/Buttons/SubmitButton';
 import { Link, useNavigate } from 'react-router-dom';
 import { Context } from '../Components/Contexts/Context';
 import Spinner from '../Components/Spinner/Spinner';
+import { AuthData } from '../types/types';
 
-type Data = {
-  userName: string;
-  email: string;
-  accessToken: string;
-  refreshToken: string;
-};
 
 const RegisterPage = () => {
   const [username, setUsername] = useState<string>('');
@@ -49,7 +44,7 @@ const RegisterPage = () => {
       const response = await fetch(`${baseUrl}/api/account/register`, options);
 
       if (response.ok) {
-        const data: Data = await response.json();
+        const data: AuthData = await response.json();
         localStorage.setItem('userName', data.userName);
         localStorage.setItem('email', data.email);
         localStorage.setItem('accessToken', data.accessToken);

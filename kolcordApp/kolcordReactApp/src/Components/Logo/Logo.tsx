@@ -1,10 +1,9 @@
 import { Link } from 'react-router-dom';
+import { LogoProp } from '../../types/types';
 
-type Logo = {
-  route: string;
-}
 
-const Logo  = ({route} : Logo) => {
+
+const Logo: React.FC<LogoProp>  = ({route}) => {
 
   return (
     <Link to={route} className='flex justify-center pt-3 md:justify-start md:p-5'>

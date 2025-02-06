@@ -1,11 +1,7 @@
-type InputField = {
-  inputValue : string;
-  inputState: (value: string) => void;
-  type: string
-  children: React.ReactNode;
-}
+import { InputFieldProp } from '../../types/types'
 
-const InputField = ({ inputValue, inputState, type, children } : InputField) => {
+
+const InputField: React.FC<InputFieldProp> = ({ inputValue, inputState, type, children }) => {
   return (
     <div className='font-oswald flex flex-col mb-5'>
         <label className='text-xl md:text-2xl'>{children}</label>

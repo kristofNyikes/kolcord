@@ -4,13 +4,8 @@ import { useNavigate } from 'react-router';
 import { useContext, useState } from 'react';
 import { Context } from '../Components/Contexts/Context';
 import Spinner from '../Components/Spinner/Spinner';
+import { Data } from '../types/types';
 
-type Data = {
-  userName: string;
-  email: string;
-  token: string;
-  refreshToken: string;
-};
 
 const LoginPage = () => {
   const [email, setEmail] = useState<string>('');
