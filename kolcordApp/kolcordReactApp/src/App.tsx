@@ -9,18 +9,21 @@ function App() {
   });
   const navigate = useNavigate();
   useEffect(() => {
-    if(signedIn) {
+    if (signedIn) {
       const token = localStorage.getItem('accessToken');
-      if(!token) {
+      if (!token) {
         setSignedIn(false);
         localStorage.clear();
         navigate('/');
+      } else {
+        navigate('/main');
       }
-      navigate('/main');
+    } else {
+      navigate('/');
     }
-  }, [])
+  }, [signedIn, navigate]);
 
-  const route = '/'
+  const route = '/';
 
   return (
     <Context.Provider value={[signedIn, setSignedIn]}>
