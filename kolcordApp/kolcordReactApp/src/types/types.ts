@@ -63,3 +63,19 @@ export type FriendRequestsContextType = {
 export type ProtectedRouteProps = {
   children: React.ReactNode;
 }
+
+export type SearchResultItemType = {
+  result: UserWithFrStatus;
+}
+
+export type SearchButtonProp = {
+  onSearch: () => void;
+}
+
+export type UserWithFrStatus = {
+  id: string;
+  avatar: string;
+  bio: string;
+  userName: string;
+  isFriend: boolean;
+}
