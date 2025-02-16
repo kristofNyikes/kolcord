@@ -32,8 +32,21 @@ public static class UserMappers
         return new FriendRequestDto
         {
             Id = friendRequest.Id,
-            SenderId = friendRequest.SenderId,
-            ReceiverId = friendRequest.ReceiverId
+            Sender = friendRequest.Sender.FromUserToUserDto(),
+            FriendRequestStatus = friendRequest.FriendRequestStatus,
+            CreatedAt = friendRequest.CreatedAt
+        };
+    }
+
+    public static UserWithFrStatus FromUserToUserWithFrStatus(this ApplicationUser appUser, bool isFriendUser)
+    {
+        return new UserWithFrStatus
+        {
+            Id = appUser.Id,
+            Avatar = appUser.Avatar,
+            Bio = appUser.Bio,
+            isFriend = isFriendUser,
+            UserName = appUser.UserName!
         };
     }
 }

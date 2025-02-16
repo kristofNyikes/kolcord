@@ -1,8 +1,12 @@
-﻿namespace kolcordWebApi.Dtos.User;
+﻿using kolcordWebApi.Models.Enums;
+using kolcordWebApi.Models;
+
+namespace kolcordWebApi.Dtos.User;
 
 public class FriendRequestDto
 {
     public int Id { get; set; }
-    public string SenderId { get; set; }
-    public string ReceiverId { get; set; }
+    public UserDto Sender { get; set; }
+    public FriendRequestStatus FriendRequestStatus { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

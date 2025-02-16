@@ -132,7 +132,6 @@ public class AccountController : ControllerBase
     [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest refreshToken)
     {
-        Console.WriteLine(refreshToken);
         var user = await _userManager.Users.SingleOrDefaultAsync(u => u.RefreshToken == refreshToken.RefreshToken);
         if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
         {

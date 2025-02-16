@@ -1,5 +1,7 @@
 ﻿using kolcordWebApi.Data;
+using kolcordWebApi.Dtos.User;
 using kolcordWebApi.Interfaces;
+using kolcordWebApi.Mappers;
 using kolcordWebApi.Models.Enums;
 using kolcordWebApi.Models;
 using Microsoft.AspNetCore.Identity;
@@ -133,5 +135,16 @@ public class FriendshipRepository : IFriendshipRepository
     {
         var friends = await _context.Friendships.Where(f => f.UserId == user.Id).Include(f => f.Friend).ToListAsync();
         return friends;
+    }
+
+    public async Task<List<FriendRequestDto>?> GetFriendRequests(ApplicationUser user)
+    {
+        var friendRequests = await _context.FriendRequests
+            .Where(f => f.ReceiverId == user.Id)
+            .Where(s => s.FriendRequestStatus == 0)
+            .Include(f => f.Sender)
+            .Select(f => f.FromFriendRequestToDto())
+            .ToListAsync();
+        return friendRequests;
     }
 }

@@ -115,4 +115,18 @@ public class FriendshipController : ControllerBase
         var friendsDto = friends!.Select(f => f.FromFriendshipToDto());
         return Ok(friendsDto);
     }
+
+    [HttpGet("friend-requests")]
+    [Authorize]
+    public async Task<IActionResult> GetFriendRequests()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return Unauthorized("Sign in to get the friend requests");
+        }
+
+        var friendRequests = await _friendshipRepo.GetFriendRequests(user);
+        return Ok(friendRequests);
+    }
 }

@@ -1,4 +1,5 @@
-﻿using kolcordWebApi.Models;
+﻿using kolcordWebApi.Dtos.User;
+using kolcordWebApi.Models;
 
 namespace kolcordWebApi.Interfaces;
 
@@ -11,4 +12,5 @@ public interface IFriendshipRepository
     public Task<bool> AcceptFriendRequest(int requestId, ApplicationUser user);
     public Task<bool> RejectFriendRequest(int requestId, ApplicationUser user);
     public Task<List<Friendship>?> GetFriendships(ApplicationUser user);
+    public Task<List<FriendRequestDto>?> GetFriendRequests(ApplicationUser user);
 }

@@ -25,7 +25,19 @@ public class UserController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetUser([FromRoute] string userName)
     {
+        var signedInUser = await _userManager.GetUserAsync(User);
+        if (signedInUser == null)
+        {
+            return Unauthorized();
+        }
+        var signedInUserId = signedInUser!.Id;
+
         var user = await _userRepo.GetByName(userName);
+        if (user != null && user.Id == signedInUserId)
+        {
+            return BadRequest();
+        }
+
         if (user == null)
         {
             return NotFound($"Can't find a user called: {userName}");
@@ -33,6 +45,24 @@ public class UserController : ControllerBase
         return Ok(user.FromUserToUserDto());
     }
 
-    
+    [HttpGet("search-users/{name}")]
+    [Authorize]
+    public async Task<IActionResult> SearchForUsers([FromRoute] string name)
+    {
+        var signedInUser = await _userManager.GetUserAsync(User);
+        if (signedInUser == null)
+        {
+            return Unauthorized();
+        }
 
+        var signedInUserId = signedInUser!.Id;
+
+        var users = await _userRepo.SearchUsers(name, signedInUserId);
+        if (users == null)
+        {
+            return BadRequest("No users by this name");
+        }
+
+        return Ok(users);
+    }
 }
