@@ -5,6 +5,9 @@ import LoginPage from '../Pages/LoginPage';
 import RegisterPage from '../Pages/RegisterPage';
 import MainPage from '../Pages/MainPage';
 import ProtectedRoute from './ProtectedRoute';
+import FriendList from '../Components/Friends/FriendList';
+import FriendRequests from '../Components/Friends/FriendRequests';
+import Search from '../Components/Search/Search';
 
 export const router = createBrowserRouter([
   {
@@ -21,7 +24,11 @@ export const router = createBrowserRouter([
             <MainPage />
           </ProtectedRoute>
         ),
-        children: [],
+        children: [
+          {path: '', element: <FriendList/>},
+          {path: 'friend-requests', element: <FriendRequests/>},
+          {path: 'search', element: <Search/>}
+        ],
       },
     ],
   },

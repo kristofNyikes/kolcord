@@ -1,12 +1,34 @@
-import { Outlet } from 'react-router';
+import { Context } from './Components/Contexts/Context';
+import { Outlet, useNavigate } from 'react-router';
 import Logo from './Components/Logo/Logo';
+import { useEffect, useState } from 'react';
 
 function App() {
+  const [signedIn, setSignedIn] = useState<boolean>(() => {
+    return !!localStorage.getItem('accessToken');
+  });
+  const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+
+    if (token) {
+      setSignedIn(true);
+      navigate('/main');
+    } else {
+      setSignedIn(false);
+      navigate('/');
+    }
+  }, [signedIn, navigate]);
+
+  const route = '/';
+
   return (
-    <div className='bg-gradient-to-t from-red-950 via-stone-950 to-red-950 min-h-screen text-white font-oswald pt-3'>
-      <Logo/>
-      <Outlet />
-    </div>
+    <Context.Provider value={[signedIn, setSignedIn]}>
+      <div className="bg-gradient-to-t from-red-950 via-stone-950 to-red-950 min-h-screen text-white font-oswald">
+        {!signedIn && <Logo route={route} />}
+        <Outlet />
+      </div>
+    </Context.Provider>
   );
 }
 

@@ -1,12 +1,10 @@
 import React from 'react';
 import { useValidateToken } from '../hooks/useValidateToken';
+import { ProtectedRouteProps } from '../types/types';
 
 
-type Props = {
-  children: React.ReactNode;
-}
 
-const ProtectedRoute: React.FC<Props> = ({children}: Props) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({children}) => {
   useValidateToken();
 
   return children

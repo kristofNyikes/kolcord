@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using kolcordWebApi.Data;
@@ -11,9 +12,11 @@ using kolcordWebApi.Data;
 namespace kolcordWebApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250114171540_AddFriendRequestRelations")]
+    partial class AddFriendRequestRelations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,13 +53,13 @@ namespace kolcordWebApi.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "bbd044c0-af33-42a2-8e3d-9b0de8379fd5",
+                            Id = "e18bc51b-0f96-4e61-93ec-c53df9d776e9",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "bab51f15-17f2-4b08-8bc0-d9b6e425cf50",
+                            Id = "6baf5bef-2227-4598-8dc1-1d5767ad687f",
                             Name = "User",
                             NormalizedName = "USER"
                         });
