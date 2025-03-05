@@ -8,6 +8,7 @@ import { Context } from '../Contexts/Context';
 const TopBar: React.FC = memo(() => {
   const { friendRequests } = useFriendRequests();
   const [, setSignedIn] = useContext(Context);
+  const userName = localStorage.getItem("userName");
   const navigate = useNavigate();
 
   const options = {
@@ -44,7 +45,8 @@ const TopBar: React.FC = memo(() => {
           <img src="search-icon.png" alt="search for people on the platform" className="w-7" />
         </Link>
       </div>
-      <div>
+      <div className='flex gap-3 items-center'>
+        <span>{userName}</span>
         <button onClick={onLogout}>
           <img src="/logout-icon.png" alt="logout button" className='w-9'/>
         </button>
