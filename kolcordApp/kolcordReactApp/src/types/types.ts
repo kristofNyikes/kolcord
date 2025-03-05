@@ -79,3 +79,18 @@ export type UserWithFrStatus = {
   userName: string;
   isFriend: boolean;
 }
+
+export type SignalREventHandler = (data: Requests) => void;
+
+export type Friend = {
+  id: number;
+  userId: string;
+  friendDto: FriendDto;
+};
+
+export type FriendDto = {
+  id: string;
+  avatar: string;
+  bio: string;
+  userName: string;
+};

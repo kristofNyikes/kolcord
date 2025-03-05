@@ -4,16 +4,16 @@ import { Outlet } from 'react-router';
 import { fetchWithTokenCheck } from '../Helpers/fetchWithTokenRefresh';
 import { useEffect, useState } from 'react';
 import { Requests } from '../types/types';
-import { FriendRequestsProvider } from '../Routes/FriendRequestsContext';
+import { FriendRequestsProvider } from '../Components/Contexts/FriendRequestsProvider';
 
-const MainPage = () => {
+const MainPage: React.FC = () => {
   const [friendRequests, setFriendRequests] = useState<Requests[] | null>(null);
 
   useEffect(() => {
     const fetchFriends = async () => {
       const response = await fetchWithTokenCheck('/api/friendship/friend-requests', {});
       if (response.ok) {
-        const data = await response.json();
+        const data: Requests[] = await response.json();
         setFriendRequests(data);
       }
     };
