@@ -1,32 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import * as signalR from '@microsoft/signalr';
+// import { useSignalR } from '../Contexts/SignalRContext';
+
 import { Requests } from '../../types/types';
 import { fetchWithTokenCheck } from '../../Helpers/fetchWithTokenRefresh';
 import { FriendRequestsContext } from './FriendRequestsContext';
+import * as signalR from '@microsoft/signalr';
 
 export const FriendRequestsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [friendRequests, setFriendRequests] = useState<Requests[] | null>(null);
   const apiUrl = import.meta.env.VITE_BASE_URL;
-  
+
   useEffect(() => {
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(`${apiUrl}/friendRequestsHub`, {
-        accessTokenFactory: () => localStorage.getItem('accessToken') || ''
+        accessTokenFactory: async () => localStorage.getItem('accessToken') || '',
       })
       .withAutomaticReconnect()
       .build();
-  
-    connection.start()
-      .then(() => {
-        connection.on('NotifyNewFriendRequest', (newFriendRequest: Requests) => {
-          setFriendRequests((prevRequests) => 
-            prevRequests ? [...prevRequests, newFriendRequest] : [newFriendRequest]
-          );
-        });
-      })
-      .catch(err => console.error('SignalR Connection Error: ', err));
+
+    connection.start().then(() => {
+      connection.on('NotifyNewFriendRequest', (newFriendRequest: Requests) => {
+        setFriendRequests((prev) => (prev ? [...prev, newFriendRequest] : [newFriendRequest]));
+      });
+    });
 
     return () => {
+      connection.off('NotifyNewFriendRequest');
       connection.stop();
     };
   }, [apiUrl]);
@@ -43,9 +42,5 @@ export const FriendRequestsProvider: React.FC<{ children: React.ReactNode }> = (
     refetchFriendRequests();
   }, []);
 
-  return (
-    <FriendRequestsContext.Provider value={{ friendRequests, refetchFriendRequests }}>
-      {children}
-    </FriendRequestsContext.Provider>
-  );
+  return <FriendRequestsContext.Provider value={{ friendRequests, refetchFriendRequests }}>{children}</FriendRequestsContext.Provider>;
 };
