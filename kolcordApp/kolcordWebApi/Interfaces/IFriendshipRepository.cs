@@ -13,4 +13,6 @@ public interface IFriendshipRepository
     public Task<bool> RejectFriendRequest(int requestId, ApplicationUser user);
     public Task<List<Friendship>?> GetFriendships(ApplicationUser user);
     public Task<List<FriendRequestDto>?> GetFriendRequests(ApplicationUser user);
+    public Task<FriendshipDto?> GetNewestFriendship(ApplicationUser user);
+    public Task<FriendRequest?> GetFriendRequestById(int requestId);
 }

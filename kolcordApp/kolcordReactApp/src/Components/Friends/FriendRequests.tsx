@@ -1,6 +1,6 @@
 import React from 'react'
 import FriendRequestItem from './FriendRequestItem';
-import { useFriendRequests } from '../../Routes/FriendRequestsContext';
+import { useFriendRequests } from '../Contexts/FriendRequestsContext';
 
 const FriendRequests: React.FC = () => {
   const { friendRequests, refetchFriendRequests } = useFriendRequests();
