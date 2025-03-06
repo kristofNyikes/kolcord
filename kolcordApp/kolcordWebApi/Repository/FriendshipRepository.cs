@@ -99,14 +99,16 @@ public class FriendshipRepository : IFriendshipRepository
 
         var sender = await _context.Users.FindAsync(request.SenderId);
         var receiver = await _context.Users.FindAsync(request.ReceiverId);
-        if (sender != null && receiver != null)
+        if (sender == null || receiver == null)
         {
-            var result = await AddFriend(sender, receiver.UserName!);
+            return false;
+        }
 
-            if (result == null)
-            {
-                return false;
-            }
+        var result = await AddFriend(sender!, receiver!.UserName!);
+
+        if (result == null)
+        {
+            return false;
         }
 
         return true;
@@ -146,5 +148,22 @@ public class FriendshipRepository : IFriendshipRepository
             .Select(f => f.FromFriendRequestToDto())
             .ToListAsync();
         return friendRequests;
+    }
+
+    public async Task<FriendshipDto?> GetNewestFriendship(ApplicationUser user)
+    {
+        var newestFriendship = await _context.Friendships.Where(f => f.FriendId == user.Id)
+            .OrderByDescending(f => f.CreatedAt)
+            .Include(f => f.Friend)
+            .FirstOrDefaultAsync();
+
+        return newestFriendship?.FromFriendshipToDto();
+    }
+
+    public async Task<FriendRequest?> GetFriendRequestById(int requestId)
+    {
+        return await _context.FriendRequests
+            .Include(fr => fr.Sender)
+            .FirstOrDefaultAsync(fr => fr.Id == requestId);
     }
 }

@@ -1,9 +1,11 @@
-﻿using kolcordWebApi.Interfaces;
+﻿using kolcordWebApi.Hubs;
+using kolcordWebApi.Interfaces;
 using kolcordWebApi.Mappers;
 using kolcordWebApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace kolcordWebApi.Controllers;
 
@@ -13,11 +15,15 @@ public class FriendshipController : ControllerBase
 {
     private readonly IFriendshipRepository _friendshipRepo;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IHubContext<FriendRequestsHub> _friendRequestHubContext;
+    private readonly IHubContext<FriendListHub> _friendListHubContext;
 
-    public FriendshipController(IFriendshipRepository friendshipRepo, UserManager<ApplicationUser> userManager)
+    public FriendshipController(IFriendshipRepository friendshipRepo, UserManager<ApplicationUser> userManager, IHubContext<FriendRequestsHub> friendRequestHubContext, IHubContext<FriendListHub> friendListHubContext)
     {
         _friendshipRepo = friendshipRepo;
         _userManager = userManager;
+        _friendRequestHubContext = friendRequestHubContext;
+        _friendListHubContext = friendListHubContext;
     }
 
 
@@ -51,7 +57,7 @@ public class FriendshipController : ControllerBase
         var sender = await _userManager.GetUserAsync(User);
         if (sender == null)
         {
-            return Unauthorized("Sing in to send friend request");
+            return Unauthorized("Sign in to send friend request");
         }
 
         var friendRequest = await _friendshipRepo.SendFriendRequest(sender, receiverName);
@@ -59,7 +65,14 @@ public class FriendshipController : ControllerBase
         {
             return BadRequest($"{receiverName} could not be found or friendship already exists");
         }
-        return Ok(friendRequest.FromFriendRequestToDto());
+
+        var friendRequestDto = friendRequest.FromFriendRequestToDto();
+        Console.WriteLine(friendRequest.ReceiverId);
+        await _friendRequestHubContext.Clients.User(friendRequest.ReceiverId).SendAsync("NotifyNewFriendRequest", friendRequestDto);
+        Console.WriteLine($"Sent friend request notification to {friendRequest.ReceiverId}");
+
+
+        return Ok(friendRequestDto);
     }
 
     [HttpPost("accept-friend-request")]
@@ -77,6 +90,22 @@ public class FriendshipController : ControllerBase
         {
             return BadRequest("Friend request could not be accepted");
         }
+
+        var friendRequest = await _friendshipRepo.GetFriendRequestById(requestId);
+
+        if (friendRequest == null)
+        {
+            return BadRequest("Error getting friend request");
+        }
+
+        var newestFriendship = await _friendshipRepo.GetNewestFriendship(user);
+
+        if (newestFriendship == null)
+        {
+            return BadRequest("Error getting friend list");
+        }
+
+        await _friendListHubContext.Clients.User(friendRequest.SenderId).SendAsync("NewFriendship", newestFriendship);
 
         return Ok(new { Message = "Friendship accepted" });
     }

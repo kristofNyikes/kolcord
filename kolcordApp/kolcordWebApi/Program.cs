@@ -1,10 +1,12 @@
 using System.Text;
 using kolcordWebApi.Data;
+using kolcordWebApi.Hubs;
 using kolcordWebApi.Interfaces;
 using kolcordWebApi.Models;
 using kolcordWebApi.Repository;
 using kolcordWebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -83,6 +85,8 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IFriendshipRepository, FriendshipRepository>();
 
+builder.Services.AddSignalR();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -102,7 +106,10 @@ app.UseCors(x => x
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapHub<FriendRequestsHub>("/friendRequestsHub");
+app.MapHub<FriendListHub>("/friendListHub");
 
 app.MapControllers();
+
 
 app.Run();
