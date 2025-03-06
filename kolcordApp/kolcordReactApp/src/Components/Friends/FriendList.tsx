@@ -12,21 +12,30 @@ const FriendList = () => {
 
   useEffect(() => {
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl(`${apiUrl}/friendRequestsHub`, {
-        accessTokenFactory: () => localStorage.getItem('accessToken') || '',
+      .withUrl(`${apiUrl}/friendListHub`, {
+        accessTokenFactory: async () => localStorage.getItem('accessToken') || '',
       })
       .withAutomaticReconnect()
       .build();
 
     connection.start().then(() => {
-      connection.on('NewFriendship', (newFriendShip: Friend) => {
-        setFriendList((prevFriendList) => prevFriendList ? [...prevFriendList, newFriendShip] : [newFriendShip])
+      connection.on('NewFriendship', (newFriend: Friend) => {
+        setFriendList((prev) => {
+          if (prev && prev.some((f) => f.id === newFriend.id)) {
+            console.log(prev);
+            return prev;
+          }
+          console.log(prev);
+          console.log(newFriend);
+          return prev ? [...prev, newFriend] : [newFriend];
+        });
       });
-    }).catch(err => console.error('SignalR Connection Error: ', err));
+    });
 
     return () => {
+      connection.off('NewFriendship');
       connection.stop();
-    }
+    };
   }, [apiUrl]);
 
   useEffect(() => {
