@@ -28,7 +28,9 @@ export const FriendRequestsProvider: React.FC<{ children: React.ReactNode }> = (
       connection.off('NotifyNewFriendRequest');
       connection.stop();
     };
-  }, [apiUrl]);
+    //apiUrl is constant from .env
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const refetchFriendRequests = async () => {
     const response = await fetchWithTokenCheck('/api/friendship/friend-requests', {});
