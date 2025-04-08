@@ -24,5 +24,8 @@ public class FriendRequestsHub : Hub
         await Clients.User(userId).SendAsync("NotifyNewFriendRequest", friendRequest);
     }
 
-    
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        await base.OnDisconnectedAsync(exception);
+    }
 }
