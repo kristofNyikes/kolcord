@@ -1,4 +1,5 @@
 ﻿using kolcordWebApi.Models;
+using kolcordWebApi.Models.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -16,10 +17,27 @@ namespace kolcordWebApi.Data
         public DbSet<Channel> Channels { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<FriendRequest> FriendRequests { get; set; }
+        public DbSet<Conversation> Conversations { get; set; }
+        public DbSet<Participant> Participants { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Conversation)
+                .WithMany(c => c.Messages)
+                .HasForeignKey(m => m.ConversationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Channel>()
+                .HasOne(c => c.Server)
+                .WithMany(s => s.Channels)
+                .HasForeignKey(c => c.ServerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Participant>()
+                .HasKey(p => new { p.ConversationId, p.UserId });
 
             modelBuilder.Entity<ServerMember>()
                 .HasKey(sm => new { sm.UserId, sm.ServerId });
@@ -36,12 +54,6 @@ namespace kolcordWebApi.Data
                 .HasForeignKey(sm => sm.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<ServerMember>()
-                .HasOne(sm => sm.Server)
-                .WithMany(s => s.ServerMembers)
-                .HasForeignKey(sm => sm.ServerId)
-                .OnDelete(DeleteBehavior.Cascade);
-
             modelBuilder.Entity<Friendship>()
                 .HasOne(f => f.User)
                 .WithMany(u => u.Friendships)
@@ -53,30 +65,6 @@ namespace kolcordWebApi.Data
                 .WithMany()
                 .HasForeignKey(f => f.FriendId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Message>()
-                .HasOne(m => m.Channel)
-                .WithMany(c => c.Messages)
-                .HasForeignKey(m => m.ChannelId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Message>()
-                .HasOne(m => m.User)
-                .WithMany(u => u.Messages)
-                .HasForeignKey(m => m.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Channel>()
-                .HasOne(c => c.Server)
-                .WithMany(s => s.Channels)
-                .HasForeignKey(c => c.ServerId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Role>()
-                .HasOne(r => r.Server)
-                .WithMany(s => s.Roles)
-                .HasForeignKey(r => r.ServerId)
-                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Role>()
                 .HasMany(r => r.Members)
