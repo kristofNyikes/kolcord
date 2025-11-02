@@ -8,9 +8,11 @@ public class Message
     [Required]
     [StringLength(1500, ErrorMessage = "Content cannot be longer than 1500 characters")]
     public string Content { get; set; } = string.Empty;
-    public DateTime TimeStamp { get; set; }
-    public int ChannelId { get; set; }
-    public Channel Channel { get; set; }
-    public string UserId { get; set; }
-    public ApplicationUser User { get; set; }
+
+    public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
+    public int ConversationId { get; set; }
+    public Conversation Conversation { get; set; }
+    public string SenderId { get; set; }
+    public ApplicationUser Sender { get; set; }
+    public bool IsRead { get; set; }
 }

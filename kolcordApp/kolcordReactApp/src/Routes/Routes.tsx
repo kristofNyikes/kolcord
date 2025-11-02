@@ -8,6 +8,7 @@ import ProtectedRoute from './ProtectedRoute';
 import FriendList from '../Components/Friends/FriendList';
 import FriendRequests from '../Components/Friends/FriendRequests';
 import Search from '../Components/Search/Search';
+import ConversationPage from '../Pages/ConversationPage';
 
 export const router = createBrowserRouter([
   {
@@ -25,9 +26,10 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
         children: [
-          {path: '', element: <FriendList/>},
-          {path: 'friend-requests', element: <FriendRequests/>},
-          {path: 'search', element: <Search/>}
+          { path: '', element: <FriendList /> },
+          { path: 'friend-requests', element: <FriendRequests /> },
+          { path: 'search', element: <Search /> },
+          { path: 'conversations/:conversationId', element: <ConversationPage /> },
         ],
       },
     ],

@@ -67,9 +67,9 @@ public class FriendshipController : ControllerBase
         }
 
         var friendRequestDto = friendRequest.FromFriendRequestToDto();
-        Console.WriteLine(friendRequest.ReceiverId);
+
         await _friendRequestHubContext.Clients.User(friendRequest.ReceiverId).SendAsync("NotifyNewFriendRequest", friendRequestDto);
-        Console.WriteLine($"Sent friend request notification to {friendRequest.ReceiverId}");
+
 
 
         return Ok(friendRequestDto);

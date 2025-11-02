@@ -12,8 +12,8 @@ using kolcordWebApi.Data;
 namespace kolcordWebApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250204092938_updateDefaultProfilePic")]
-    partial class updateDefaultProfilePic
+    [Migration("20251102154439_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -49,20 +49,6 @@ namespace kolcordWebApi.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "bbd044c0-af33-42a2-8e3d-9b0de8379fd5",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = "bab51f15-17f2-4b08-8bc0-d9b6e425cf50",
-                            Name = "User",
-                            NormalizedName = "USER"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -279,7 +265,7 @@ namespace kolcordWebApi.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("kolcordWebApi.Models.Channel", b =>
+            modelBuilder.Entity("kolcordWebApi.Models.Conversation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -287,21 +273,23 @@ namespace kolcordWebApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int>("ServerId")
-                        .HasColumnType("integer");
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ServerId");
+                    b.ToTable("Conversations");
 
-                    b.ToTable("Channels");
+                    b.HasDiscriminator<int>("Type");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("kolcordWebApi.Models.FriendRequest", b =>
@@ -371,28 +359,57 @@ namespace kolcordWebApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ChannelId")
-                        .HasColumnType("integer");
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("text");
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasMaxLength(1500)
                         .HasColumnType("character varying(1500)");
 
-                    b.Property<DateTime>("TimeStamp")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("UserId")
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("SenderId")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ChannelId");
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("ConversationId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("kolcordWebApi.Models.Participant", b =>
+                {
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("JoinedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ConversationId", "UserId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Participants");
                 });
 
             modelBuilder.Entity("kolcordWebApi.Models.Role", b =>
@@ -431,8 +448,7 @@ namespace kolcordWebApi.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
+                        .HasColumnType("text");
 
                     b.Property<string>("IconUrl")
                         .IsRequired()
@@ -473,6 +489,32 @@ namespace kolcordWebApi.Migrations
                     b.HasIndex("ServerId");
 
                     b.ToTable("ServerMembers");
+                });
+
+            modelBuilder.Entity("kolcordWebApi.Models.Channel", b =>
+                {
+                    b.HasBaseType("kolcordWebApi.Models.Conversation");
+
+                    b.Property<int>("ServerId")
+                        .HasColumnType("integer");
+
+                    b.HasIndex("ServerId");
+
+                    b.HasDiscriminator().HasValue(2);
+                });
+
+            modelBuilder.Entity("kolcordWebApi.Models.DirectConversation", b =>
+                {
+                    b.HasBaseType("kolcordWebApi.Models.Conversation");
+
+                    b.HasDiscriminator().HasValue(0);
+                });
+
+            modelBuilder.Entity("kolcordWebApi.Models.GroupConversation", b =>
+                {
+                    b.HasBaseType("kolcordWebApi.Models.Conversation");
+
+                    b.HasDiscriminator().HasValue(1);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -541,17 +583,6 @@ namespace kolcordWebApi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("kolcordWebApi.Models.Channel", b =>
-                {
-                    b.HasOne("kolcordWebApi.Models.Server", "Server")
-                        .WithMany("Channels")
-                        .HasForeignKey("ServerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Server");
-                });
-
             modelBuilder.Entity("kolcordWebApi.Models.FriendRequest", b =>
                 {
                     b.HasOne("kolcordWebApi.Models.ApplicationUser", "Receiver")
@@ -592,19 +623,42 @@ namespace kolcordWebApi.Migrations
 
             modelBuilder.Entity("kolcordWebApi.Models.Message", b =>
                 {
-                    b.HasOne("kolcordWebApi.Models.Channel", "Channel")
+                    b.HasOne("kolcordWebApi.Models.ApplicationUser", null)
                         .WithMany("Messages")
-                        .HasForeignKey("ChannelId")
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("kolcordWebApi.Models.Conversation", "Conversation")
+                        .WithMany("Messages")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("kolcordWebApi.Models.ApplicationUser", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Conversation");
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("kolcordWebApi.Models.Participant", b =>
+                {
+                    b.HasOne("kolcordWebApi.Models.Conversation", "Conversation")
+                        .WithMany("Participants")
+                        .HasForeignKey("ConversationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("kolcordWebApi.Models.ApplicationUser", "User")
-                        .WithMany("Messages")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Channel");
+                    b.Navigation("Conversation");
 
                     b.Navigation("User");
                 });
@@ -612,7 +666,7 @@ namespace kolcordWebApi.Migrations
             modelBuilder.Entity("kolcordWebApi.Models.Role", b =>
                 {
                     b.HasOne("kolcordWebApi.Models.Server", "Server")
-                        .WithMany("Roles")
+                        .WithMany()
                         .HasForeignKey("ServerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -634,7 +688,7 @@ namespace kolcordWebApi.Migrations
             modelBuilder.Entity("kolcordWebApi.Models.ServerMember", b =>
                 {
                     b.HasOne("kolcordWebApi.Models.Server", "Server")
-                        .WithMany("ServerMembers")
+                        .WithMany("Members")
                         .HasForeignKey("ServerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -650,6 +704,17 @@ namespace kolcordWebApi.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("kolcordWebApi.Models.Channel", b =>
+                {
+                    b.HasOne("kolcordWebApi.Models.Server", "Server")
+                        .WithMany("Channels")
+                        .HasForeignKey("ServerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Server");
+                });
+
             modelBuilder.Entity("kolcordWebApi.Models.ApplicationUser", b =>
                 {
                     b.Navigation("Friendships");
@@ -661,18 +726,18 @@ namespace kolcordWebApi.Migrations
                     b.Navigation("ServerMemberships");
                 });
 
-            modelBuilder.Entity("kolcordWebApi.Models.Channel", b =>
+            modelBuilder.Entity("kolcordWebApi.Models.Conversation", b =>
                 {
                     b.Navigation("Messages");
+
+                    b.Navigation("Participants");
                 });
 
             modelBuilder.Entity("kolcordWebApi.Models.Server", b =>
                 {
                     b.Navigation("Channels");
 
-                    b.Navigation("Roles");
-
-                    b.Navigation("ServerMembers");
+                    b.Navigation("Members");
                 });
 #pragma warning restore 612, 618
         }

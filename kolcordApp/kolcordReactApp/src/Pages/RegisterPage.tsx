@@ -6,7 +6,6 @@ import { Context } from '../Components/Contexts/Context';
 import Spinner from '../Components/Spinner/Spinner';
 import { AuthData } from '../types/types';
 
-
 const RegisterPage = () => {
   const [username, setUsername] = useState<string>('');
   const [email, setEmail] = useState<string>('');
@@ -42,6 +41,7 @@ const RegisterPage = () => {
     try {
       const baseUrl = import.meta.env.VITE_BASE_URL;
       const response = await fetch(`${baseUrl}/api/account/register`, options);
+      console.log(response.body)
 
       if (response.ok) {
         const data: AuthData = await response.json();
@@ -49,6 +49,7 @@ const RegisterPage = () => {
         localStorage.setItem('email', data.email);
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
+        localStorage.setItem('userId', data.userId);
 
         setSignedIn(true);
         navigate('/main');

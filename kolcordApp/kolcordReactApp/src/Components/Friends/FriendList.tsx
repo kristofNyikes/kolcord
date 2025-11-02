@@ -22,11 +22,8 @@ const FriendList = () => {
       connection.on('NewFriendship', (newFriend: Friend) => {
         setFriendList((prev) => {
           if (prev && prev.some((f) => f.id === newFriend.id)) {
-            console.log(prev);
             return prev;
           }
-          console.log(prev);
-          console.log(newFriend);
           return prev ? [...prev, newFriend] : [newFriend];
         });
       });
@@ -36,7 +33,9 @@ const FriendList = () => {
       connection.off('NewFriendship');
       connection.stop();
     };
-  }, [apiUrl]);
+    //apiUrl is constant from .env
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const fetchFriends = async () => {

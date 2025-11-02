@@ -19,21 +19,25 @@ const MainPage: React.FC = () => {
     };
     fetchFriends();
   }, []);
-  
+
   return (
-      <FriendRequestsProvider>
-        <div>
+    <FriendRequestsProvider>
+      <div className="flex flex-col h-screen">
+        <div className="fixed top-0 left-0 right-0 z-50">
           <TopBar />
-          <div className="flex flex-row overflow-hidden">
-            <div className="w-16 flex-none overflow-y-auto">
-              <ServerList />
-            </div>
-            <div className="flex-grow bg-black/35 h-screen w-screen">
-              <Outlet context={friendRequests} />
-            </div>
+        </div>
+
+        <div className="flex flex-row pt-14 h-full">
+          {' '}
+          <div className="w-16 flex-none">
+            <ServerList />
+          </div>
+          <div className="flex-grow bg-black/35 overflow-auto">
+            <Outlet context={friendRequests} />
           </div>
         </div>
-      </FriendRequestsProvider>
+      </div>
+    </FriendRequestsProvider>
   );
 };
 

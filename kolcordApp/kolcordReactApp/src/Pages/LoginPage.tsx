@@ -6,7 +6,6 @@ import { Context } from '../Components/Contexts/Context';
 import Spinner from '../Components/Spinner/Spinner';
 import { Data } from '../types/types';
 
-
 const LoginPage = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -47,9 +46,10 @@ const LoginPage = () => {
         localStorage.setItem('email', data.email);
         localStorage.setItem('accessToken', data.token);
         localStorage.setItem('refreshToken', data.refreshToken);
-        
+        localStorage.setItem('userId', data.userId);
+
         setSignedIn(true);
-        navigate("/main")
+        navigate('/main');
       }
     } catch (error) {
       console.error(error);
@@ -74,8 +74,8 @@ const LoginPage = () => {
           </form>
         </div>
       ) : (
-        <div className='m-40'>
-          <Spinner size={64}/>
+        <div className="m-40">
+          <Spinner size={64} />
         </div>
       )}
     </div>

@@ -9,13 +9,14 @@ public class FriendListHub: Hub
 {
     public override async Task OnConnectedAsync()
     {
-        //Console.WriteLine($"Connection established: {Context.ConnectionId}");
-        //Console.WriteLine($"signalR hub on connect user id: {Context.UserIdentifier}");
         await base.OnConnectedAsync();
-        //await Clients.All.SendAsync("UserConnected", Context.ConnectionId);
     }
     public async Task AcceptedFriendRequest(string userId, FriendshipDto friendship)
     {
         await Clients.User(userId).SendAsync("NewFriendship", friendship);
+    }
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        await base.OnDisconnectedAsync(exception);
     }
 }
