@@ -1,7 +1,6 @@
 ﻿using kolcordWebApi.Data;
 using kolcordWebApi.Dtos.Conversation;
 using kolcordWebApi.Interfaces;
-using kolcordWebApi.Mappers;
 using kolcordWebApi.Models;
 using kolcordWebApi.Models.Enums;
 using Microsoft.AspNetCore.Identity;
@@ -22,19 +21,20 @@ public class MessageRepository : IMessageRepository
 
     public async Task<ConversationDto> GetOrCreateDirectConversation(string userId1, string userId2)
     {
-        // Fetch user data in one query
-        var users = await _context.Users
-            .Where(u => u.Id == userId1 || u.Id == userId2)
-            .Select(u => new { u.Id, u.UserName })
-            .ToDictionaryAsync(u => u.Id);
+        var user1 = await _userManager.FindByIdAsync(userId1);
+        var user2 = await _userManager.FindByIdAsync(userId2);
 
-        if (users.Count != 2)
+        if (user1 == null || user2 == null)
             throw new ArgumentException("One or both users not found");
 
-        // Check for existing conversation using discriminator directly
         var existing = await _context.Conversations
-            .Where(c => c.Type == ConversationType.Direct)
-            .Where(c => c.Participants.Count(p => p.UserId == userId1 || p.UserId == userId2) == 2)
+            .OfType<DirectConversation>()
+            .Include(c => c.Participants)
+            .ThenInclude(p => p.User)
+            .Include(c => c.Messages)
+            .ThenInclude(m => m.Sender)
+            .Where(c => c.Participants.Any(p => p.UserId == userId1) &&
+                       c.Participants.Any(p => p.UserId == userId2))
             .Select(c => new ConversationDto(
                 c.Id,
                 c.Name,
@@ -42,7 +42,7 @@ public class MessageRepository : IMessageRepository
                 c.CreatedAt,
                 c.Participants.Select(p => new ParticipantDto(
                     p.UserId,
-                    users.ContainsKey(p.UserId) ? users[p.UserId].UserName : string.Empty
+                    p.User.UserName
                 )).ToList(),
                 c.Messages
                     .OrderByDescending(m => m.TimeStamp)
@@ -61,10 +61,9 @@ public class MessageRepository : IMessageRepository
         if (existing != null)
             return existing;
 
-        // Create new conversation
         var conversation = new DirectConversation
         {
-            Name = $"{users[userId1].UserName} & {users[userId2].UserName}",
+            Name = $"{user1.UserName} & {user2.UserName}",
             Participants = new List<Participant>
         {
             new() { UserId = userId1 },
@@ -75,21 +74,33 @@ public class MessageRepository : IMessageRepository
         _context.Conversations.Add(conversation);
         await _context.SaveChangesAsync();
 
-        // Map to DTO after save
+        var createdConversation = await _context.Conversations
+            .OfType<DirectConversation>()
+            .Include(c => c.Participants)
+            .ThenInclude(p => p.User)
+            .FirstAsync(c => c.Id == conversation.Id);
+
         return new ConversationDto(
-            conversation.Id,
-            conversation.Name,
-            conversation.Type,
-            conversation.CreatedAt,
-            conversation.Participants
-                .Select(p => new ParticipantDto(p.UserId, users[p.UserId].UserName))
+            createdConversation.Id,
+            createdConversation.Name,
+            createdConversation.Type,
+            createdConversation.CreatedAt,
+            createdConversation.Participants
+                .Select(p => new ParticipantDto(p.UserId, p.User.UserName))
                 .ToList(),
-            null // No messages yet
+            null
         );
     }
 
     public async Task<GroupConversation> CreateGroupConversation(string creatorId, string name, List<string> memberIds)
     {
+        var usersExist = await _context.Users
+            .Where(u => memberIds.Contains(u.Id))
+            .CountAsync() == memberIds.Count;
+
+        if (!usersExist)
+            throw new ArgumentException("One or more users not found");
+
         var conversation = new GroupConversation
         {
             Name = name,
@@ -108,7 +119,6 @@ public class MessageRepository : IMessageRepository
 
     public async Task<MessageDto> SendMessage(string senderId, int conversationId, string content, int? replyToMessageId = null)
     {
-        // Create and save the message
         var message = new Message
         {
             Content = content,
@@ -120,9 +130,9 @@ public class MessageRepository : IMessageRepository
         _context.Messages.Add(message);
         await _context.SaveChangesAsync();
 
-        // Fetch with complete projection
         return await _context.Messages
             .Where(m => m.Id == message.Id)
+            .Include(m => m.Sender)
             .Select(m => new MessageDto(
                 m.Id,
                 m.Content,
@@ -134,11 +144,11 @@ public class MessageRepository : IMessageRepository
             .FirstAsync();
     }
 
-    public async Task<List<Message>> GetMessages(int conversationId, int skip = 0, int take = 10)
+    public async Task<List<Message>> GetMessages(int conversationId, int skip = 0, int take = 20)
     {
         return await _context.Messages
             .Where(m => m.ConversationId == conversationId)
-            .OrderBy(m => m.TimeStamp)
+            .OrderByDescending(m => m.TimeStamp)
             .Skip(skip)
             .Take(take)
             .ToListAsync();
@@ -153,4 +163,14 @@ public class MessageRepository : IMessageRepository
             .Include(c => c.Messages.OrderByDescending(m => m.TimeStamp).Take(1))
             .ToListAsync();
     }
+
+    public async Task<Message?> GetMessage(int messageId)
+    {
+        var message = await _context.Messages.FindAsync(messageId);
+        if (message == null) return null;
+
+        message.IsRead = true;
+        await _context.SaveChangesAsync();
+        return message;
+    } 
 }

@@ -10,4 +10,5 @@ public interface IMessageRepository
     public Task<MessageDto> SendMessage(string senderId, int conversationId, string content, int? replyToMessageId = null);
     public Task<List<Message>> GetMessages(int conversationId, int skip = 0, int take = 10);
     public Task<List<Conversation>> GetUserConversation(string userId);
+    public Task<Message?> GetMessage(int messageId);
 }
