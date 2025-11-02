@@ -91,21 +91,6 @@ namespace kolcordWebApi.Data
                 .WithMany()
                 .HasForeignKey(fr => fr.ReceiverId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            //List<IdentityRole> roles = new List<IdentityRole>
-            //{
-            //    new IdentityRole
-            //    {
-            //        Name = "Admin",
-            //        NormalizedName = "ADMIN"
-            //    },
-            //    new IdentityRole
-            //    {
-            //        Name = "User",
-            //        NormalizedName = "USER"
-            //    }
-            //};
-            //modelBuilder.Entity<IdentityRole>().HasData(roles);
         }
     }
 }
