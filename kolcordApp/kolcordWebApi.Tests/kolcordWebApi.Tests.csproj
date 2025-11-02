@@ -36,7 +36,6 @@
   <ItemGroup>
     <Folder Include="Unit\Controllers\" />
     <Folder Include="Unit\Services\" />
-    <Folder Include="Unit\Repositories\" />
   </ItemGroup>
 
 </Project>
