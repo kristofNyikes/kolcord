@@ -1,9 +1,11 @@
 ﻿using kolcordWebApi.Dtos.Conversation;
+using kolcordWebApi.Hubs;
 using kolcordWebApi.Interfaces;
 using kolcordWebApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace kolcordWebApi.Controllers;
 
@@ -14,11 +16,13 @@ public class ConversationsController : ControllerBase
 {
     private readonly IMessageRepository _repo;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IHubContext<ConversationHub> _hubContext;
 
-    public ConversationsController(IMessageRepository repo, UserManager<ApplicationUser> userManager)
+    public ConversationsController(IMessageRepository repo, UserManager<ApplicationUser> userManager, IHubContext<ConversationHub> hubContext)
     {
         _repo = repo;
         _userManager = userManager;
+        _hubContext = hubContext;
     }
 
     [HttpGet]
@@ -58,7 +62,7 @@ public class ConversationsController : ControllerBase
 
     [HttpGet("{conversationId}/messages")]
     public async Task<IActionResult> GetMessages(int conversationId, [FromQuery] int skip = 0,
-        [FromQuery] int take = 50)
+        [FromQuery] int take = 20)
     {
         var messages = await _repo.GetMessages(conversationId, skip, take);
         return Ok(messages);
@@ -78,6 +82,23 @@ public class ConversationsController : ControllerBase
             request.Content,
             request.ReplyToMessageId
         );
+
+        await _hubContext.Clients.Group($"conv-{conversationId}")
+            .SendAsync("ReceiveMessage", message);
+
         return Ok(message);
     }
+
+    [HttpPost("{messageId}/mark-read")]
+    public async Task<IActionResult> MarkMessageRead(int messageId)
+    {
+        var message = await _repo.GetMessage(messageId);
+        if (message == null) return NotFound();
+
+        await _hubContext.Clients.Group($"conv-{message.ConversationId}")
+            .SendAsync("MessageRead", messageId);
+
+        return Ok();
+    }
+
 }

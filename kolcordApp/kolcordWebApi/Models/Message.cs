@@ -14,4 +14,5 @@ public class Message
     public Conversation Conversation { get; set; }
     public string SenderId { get; set; }
     public ApplicationUser Sender { get; set; }
+    public bool IsRead { get; set; }
 }
