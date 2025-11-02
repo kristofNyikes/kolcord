@@ -1,4 +1,5 @@
 ﻿using kolcordWebApi.Models;
+using kolcordWebApi.Models.Enums;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +23,11 @@ namespace kolcordWebApi.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Conversation>()
+                .HasDiscriminator<ConversationType>(c => c.Type)
+                .HasValue<DirectConversation>(ConversationType.Direct)
+                .HasValue<GroupConversation>(ConversationType.Group)
+                .HasValue<Channel>(ConversationType.Channel);
             modelBuilder.Entity<Message>()
                 .HasOne(m => m.Sender)
                 .WithMany()

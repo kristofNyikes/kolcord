@@ -273,11 +273,6 @@ namespace kolcordWebApi.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("character varying(13)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -289,7 +284,7 @@ namespace kolcordWebApi.Migrations
 
                     b.ToTable("Conversations");
 
-                    b.HasDiscriminator().HasValue("Conversation");
+                    b.HasDiscriminator<int>("Type");
 
                     b.UseTphMappingStrategy();
                 });
@@ -502,7 +497,21 @@ namespace kolcordWebApi.Migrations
 
                     b.HasIndex("ServerId");
 
-                    b.HasDiscriminator().HasValue("Channel");
+                    b.HasDiscriminator().HasValue(2);
+                });
+
+            modelBuilder.Entity("kolcordWebApi.Models.DirectConversation", b =>
+                {
+                    b.HasBaseType("kolcordWebApi.Models.Conversation");
+
+                    b.HasDiscriminator().HasValue(0);
+                });
+
+            modelBuilder.Entity("kolcordWebApi.Models.GroupConversation", b =>
+                {
+                    b.HasBaseType("kolcordWebApi.Models.Conversation");
+
+                    b.HasDiscriminator().HasValue(1);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
