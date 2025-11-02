@@ -14,6 +14,18 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
+    });
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -53,9 +65,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    options.Password.RequireDigit = true;
+    //no strict requirements during development most of this will be set to true
+    options.Password.RequireDigit = false;
     options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;
+    options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredLength = 3;
 }).AddEntityFrameworkStores<AppDbContext>();
@@ -88,7 +101,7 @@ builder.Services.AddAuthentication(options =>
             var path = context.HttpContext.Request.Path;
 
             if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/friendListHub") ||
-                                                       path.StartsWithSegments("/friendRequestsHub")))
+                                                       path.StartsWithSegments("/friendRequestsHub")) || path.StartsWithSegments("/conversationHub"))
             {
                 context.Token = accessToken;
             }
@@ -115,18 +128,54 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors(x => x
-    .AllowAnyMethod()
-    .AllowAnyHeader()
-    .AllowCredentials()
-    .SetIsOriginAllowed(options => true));
+app.UseCors("ReactApp");
+
+//app.UseCors(x => x
+//    .AllowAnyMethod()
+//    .AllowAnyHeader()
+//    .AllowCredentials()
+//    .SetIsOriginAllowed(options => true));
 
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapHub<FriendRequestsHub>("/friendRequestsHub");
 app.MapHub<FriendListHub>("/friendListHub");
+app.MapHub<ConversationHub>("/conversationHub");
 
 app.MapControllers();
+
+using(var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+        var adminRoleExists = await roleManager.RoleExistsAsync("Admin");
+        var userRoleExists = await roleManager.RoleExistsAsync("User");
+
+        if(!adminRoleExists || !userRoleExists)
+        {
+            string[] roleNames = { "Admin", "User" };
+            foreach(var roleName in roleNames)
+            {
+                if (!await roleManager.RoleExistsAsync(roleName))
+                {
+                    await roleManager.CreateAsync(new IdentityRole(roleName));
+                    Console.WriteLine($"Created role: {roleName}");
+                }
+            }
+            Console.WriteLine("Role seeding completed.");
+        } else
+        {
+            Console.WriteLine("Roles already exist. Skipping seeding.");
+        }
+    } catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occured seeding roles.");
+    }
+}
 
 
 app.Run();

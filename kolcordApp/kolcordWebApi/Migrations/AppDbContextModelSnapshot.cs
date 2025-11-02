@@ -46,20 +46,6 @@ namespace kolcordWebApi.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "a734e265-6910-488a-82a3-7c476bf4264b",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = "6ab91d0d-c657-44cd-8ea5-fa46b075b8aa",
-                            Name = "User",
-                            NormalizedName = "USER"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -375,6 +361,9 @@ namespace kolcordWebApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("text");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasMaxLength(1500)
@@ -382,6 +371,9 @@ namespace kolcordWebApi.Migrations
 
                     b.Property<int>("ConversationId")
                         .HasColumnType("integer");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("SenderId")
                         .IsRequired()
@@ -391,6 +383,8 @@ namespace kolcordWebApi.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("ConversationId");
 
@@ -617,6 +611,10 @@ namespace kolcordWebApi.Migrations
 
             modelBuilder.Entity("kolcordWebApi.Models.Message", b =>
                 {
+                    b.HasOne("kolcordWebApi.Models.ApplicationUser", null)
+                        .WithMany("Messages")
+                        .HasForeignKey("ApplicationUserId");
+
                     b.HasOne("kolcordWebApi.Models.Conversation", "Conversation")
                         .WithMany("Messages")
                         .HasForeignKey("ConversationId")
@@ -624,9 +622,9 @@ namespace kolcordWebApi.Migrations
                         .IsRequired();
 
                     b.HasOne("kolcordWebApi.Models.ApplicationUser", "Sender")
-                        .WithMany("Messages")
+                        .WithMany()
                         .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Conversation");

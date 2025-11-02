@@ -1,6 +1,4 @@
 ﻿using kolcordWebApi.Models;
-using kolcordWebApi.Models.Enums;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,6 +21,12 @@ namespace kolcordWebApi.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Sender)
+                .WithMany()
+                .HasForeignKey(m => m.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Message>()
                 .HasOne(m => m.Conversation)
@@ -82,20 +86,20 @@ namespace kolcordWebApi.Data
                 .HasForeignKey(fr => fr.ReceiverId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            List<IdentityRole> roles = new List<IdentityRole>
-            {
-                new IdentityRole
-                {
-                    Name = "Admin",
-                    NormalizedName = "ADMIN"
-                },
-                new IdentityRole
-                {
-                    Name = "User",
-                    NormalizedName = "USER"
-                }
-            };
-            modelBuilder.Entity<IdentityRole>().HasData(roles);
+            //List<IdentityRole> roles = new List<IdentityRole>
+            //{
+            //    new IdentityRole
+            //    {
+            //        Name = "Admin",
+            //        NormalizedName = "ADMIN"
+            //    },
+            //    new IdentityRole
+            //    {
+            //        Name = "User",
+            //        NormalizedName = "USER"
+            //    }
+            //};
+            //modelBuilder.Entity<IdentityRole>().HasData(roles);
         }
     }
 }
