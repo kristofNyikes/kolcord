@@ -3,7 +3,7 @@ export type Requests = {
   sender: UserDto;
   friendRequestStatus: number;
   createdAt: Date;
-}
+};
 export type UserDto = {
   id: string;
   avatar: string;
@@ -11,36 +11,37 @@ export type UserDto = {
   userName: string;
 };
 export type FriendRequestItemProp = {
-  request: Requests
-  removeRequest (): void;
-}
+  request: Requests;
+  removeRequest(): void;
+};
 
 export type Data = {
   userName: string;
   email: string;
   token: string;
   refreshToken: string;
+  userId: string;
 };
 
 export type FriendItemType = {
-  friend: UserDto
-}
+  friend: UserDto;
+};
 
 export type RoundImageProps = {
-  src: string
-  size: '8' | '11' | '32'
-}
+  src: string;
+  size: '8' | '11' | '32';
+};
 
 export type InputFieldProp = {
-  inputValue : string;
+  inputValue: string;
   inputState: (value: string) => void;
-  type: string
+  type: string;
   children: React.ReactNode;
-}
+};
 
 export type LogoProp = {
   route: string;
-}
+};
 
 export type SpinnerProp = {
   size?: number;
@@ -53,6 +54,7 @@ export type AuthData = {
   email: string;
   accessToken: string;
   refreshToken: string;
+  userId: string;
 };
 
 export type FriendRequestsContextType = {
@@ -62,15 +64,15 @@ export type FriendRequestsContextType = {
 
 export type ProtectedRouteProps = {
   children: React.ReactNode;
-}
+};
 
 export type SearchResultItemType = {
   result: UserWithFrStatus;
-}
+};
 
 export type SearchButtonProp = {
   onSearch: () => void;
-}
+};
 
 export type UserWithFrStatus = {
   id: string;
@@ -78,7 +80,7 @@ export type UserWithFrStatus = {
   bio: string;
   userName: string;
   isFriend: boolean;
-}
+};
 
 export type SignalREventHandler = (data: Requests) => void;
 
@@ -94,3 +96,26 @@ export type FriendDto = {
   bio: string;
   userName: string;
 };
+
+export interface MessageDto {
+  id: number;
+  content: string;
+  timeStamp: string;
+  senderId: string;
+  senderName: string;
+  conversationId: number;
+}
+
+export interface ConversationDto {
+  id: number;
+  name: string;
+  type: 'Direct' | 'Group' | 'Channel';
+  createdAt: string;
+  participants: ParticipantDto[];
+  lastMessage?: MessageDto;
+}
+
+export interface ParticipantDto {
+  userId: string;
+  userName: string;
+}
