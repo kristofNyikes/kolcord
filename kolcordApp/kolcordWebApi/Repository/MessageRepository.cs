@@ -65,10 +65,10 @@ public class MessageRepository : IMessageRepository
         {
             Name = $"{user1.UserName} & {user2.UserName}",
             Participants = new List<Participant>
-        {
-            new() { UserId = userId1 },
-            new() { UserId = userId2 }
-        }
+            {
+                new() { UserId = userId1 },
+                new() { UserId = userId2 }
+            }
         };
 
         _context.Conversations.Add(conversation);
