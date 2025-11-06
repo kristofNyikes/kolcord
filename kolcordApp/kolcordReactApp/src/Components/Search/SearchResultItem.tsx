@@ -35,7 +35,7 @@ const SearchResultItem: React.FC<SearchResultItemType> = ({ result }) => {
   return (
     <div className="flex items-center justify-between gap-2 bg-red-950/30 rounded-3xl m-3 w-4/5">
       <div className="flex items-center">
-        <RoundedImage src={result.avatar} size={'11'} />
+        <RoundedImage src={result.avatar ? result.avatar : "/user-image-backup.png"} size={'11'} />
         <span className="">{result.userName}</span>
       </div>
       <div className="flex items-center gap-2 mr-2">

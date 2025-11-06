@@ -34,7 +34,7 @@ const FriendItem = ({ friend }: FriendItemType) => {
       disabled={isLoading}
       className="flex items-center gap-2 bg-red-950/30 hover:scale-105 transition-transform duration-300 m-3 w-4/5 rounded-3xl p-2"
     >
-      <RoundedImage src={friend.avatar} size={'11'} />
+      <RoundedImage src={friend.avatar ? friend.avatar : "/user-image-backup.png"} size={'11'} />
       <span className="truncate">{friend.userName}</span>
       {isLoading && <span className="ml-2">...</span>}
     </button>

@@ -39,7 +39,7 @@ const FriendRequestItem: React.FC<FriendRequestItemProp> = ({ request, removeReq
   return (
     <div className="flex items-center justify-between gap-2 bg-red-950/30 rounded-3xl m-3 w-4/5">
       <div className='flex items-center'>
-        <RoundedImage src={request.sender.avatar} size={'11'} />
+        <RoundedImage src={request.sender.avatar ? request.sender.avatar : "/user-image-backup.png"} size={'11'} />
         <span className="">{request.sender.userName}</span>
       </div>
       <div className='flex items-center gap-2 mr-2'>
