@@ -5,8 +5,7 @@ namespace kolcordWebApi.Models;
 
 public class ApplicationUser : IdentityUser
 {
-    public string Avatar { get; set; } =
-        "https://res.cloudinary.com/dilctmmuh/image/upload/v1738661033/riixinvcxidpygnqdexg.png";
+    public string Avatar { get; set; } = string.Empty;
     [StringLength(500, ErrorMessage = "Bio length cannot be more then 500 characters")]
     public string Bio { get; set; } = string.Empty;
 
