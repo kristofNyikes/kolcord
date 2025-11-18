@@ -1,6 +1,7 @@
 ﻿using kolcordWebApi.Dtos.Conversation;
 using kolcordWebApi.Hubs;
 using kolcordWebApi.Interfaces;
+using kolcordWebApi.Mappers;
 using kolcordWebApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -26,7 +27,7 @@ public class ConversationsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetConversation()
+    public async Task<IActionResult> GetConversations()
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
@@ -36,7 +37,9 @@ public class ConversationsController : ControllerBase
 
         var conversations = await _repo.GetUserConversation(user.Id);
 
-        return Ok(conversations);
+        var conversationDto = conversations.Select(c => c.FromConversationToDto());
+
+        return Ok(conversationDto);
     }
 
     [HttpPost("direct")]
@@ -99,6 +102,17 @@ public class ConversationsController : ControllerBase
             .SendAsync("MessageRead", messageId);
 
         return Ok();
+    }
+
+    [HttpGet("last-message/{friendUserId}")]
+    public async Task<IActionResult> GetLastMessage(string friendUserId)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        var conversation = await _repo.GetOrCreateDirectConversation(user.Id, friendUserId);
+        var messageList = await _repo.GetMessages(conversation.Id, 0, 1);
+        var lastMessage = messageList.Select(m => m.FromMessageToDto()).FirstOrDefault();
+
+        return Ok(lastMessage);
     }
 
 }
