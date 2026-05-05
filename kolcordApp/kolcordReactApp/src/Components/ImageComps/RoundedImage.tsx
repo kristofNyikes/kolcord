@@ -9,7 +9,7 @@ const RoundedImage: React.FC<RoundImageProps> = ({src, size}) => {
   return (
     <div className='flex'>
       <div className='flex items-center'>
-        <img src={src} alt="friend avatar" className={`inline-block ${sizeList[size]} rounded-full object-cover border-2 border-black/30`}/>
+        <img src={src} alt="friend avatar" className={`inline-block ${sizeList[size]} bg-red-950 rounded-full object-cover border-2 border-black/30 `}/>
       </div>
     </div>
   );

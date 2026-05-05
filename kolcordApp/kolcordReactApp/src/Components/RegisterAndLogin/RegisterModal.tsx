@@ -1,12 +1,13 @@
 import { useContext, useState } from "react";
-import InputField from "../Components/InputField/InputField";
-import SubmitButton from "../Components/Buttons/SubmitButton";
-import { Link, useNavigate } from "react-router-dom";
-import { Context } from "../Components/Contexts/Context";
-import Spinner from "../Components/Spinner/Spinner";
-import { AuthData } from "../types/types";
+import InputField from "../InputField/InputField";
+import SubmitButton from "../Buttons/SubmitButton";
+import { useNavigate } from "react-router-dom";
+import { Context } from "../Contexts/Context";
+import Spinner from "../Spinner/Spinner";
+import { AuthData } from "../../types/types";
+import { LoginRegisterProps } from "../../types/types";
 
-const RegisterPage = () => {
+const RegisterModal = ({ setModal }: LoginRegisterProps) => {
   const [username, setUsername] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -62,6 +63,8 @@ const RegisterPage = () => {
     }
   };
 
+  const handleChangeModal = () => setModal(false);
+
   return (
     <div className="flex flex-col justify-center items-center">
       {!isLoading ? (
@@ -88,9 +91,9 @@ const RegisterPage = () => {
             Pasword:{" "}
           </InputField>
           <SubmitButton>Submit</SubmitButton>
-          <Link to={"/login"} className="hover:text-red-700">
-            Already have an account?
-          </Link>
+          <button onClick={handleChangeModal} className="hover:text-red-700">
+            Already have an account? Log in
+          </button>
         </form>
       ) : (
         <div className="m-40">
@@ -100,4 +103,4 @@ const RegisterPage = () => {
     </div>
   );
 };
-export default RegisterPage;
+export default RegisterModal;

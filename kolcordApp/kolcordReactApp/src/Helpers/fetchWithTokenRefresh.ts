@@ -1,5 +1,5 @@
-import { jwtDecode } from 'jwt-decode';
-import { constants } from './globalConstants';
+import { jwtDecode } from "jwt-decode";
+import { constants } from "./globalConstants";
 
 type Data = {
   accessToken: string;
@@ -18,27 +18,28 @@ const isTokenExpiringSoon = (token: string | null): boolean => {
   }
 };
 
-export const fetchWithTokenCheck = async (url: string, options: RequestInit): Promise<Response> => {
+export const fetchWithTokenCheck = async (
+  url: string,
+  options: RequestInit,
+): Promise<Response> => {
   const baseUrl = import.meta.env.VITE_BASE_URL;
-  let accessToken = localStorage.getItem('accessToken');
+  let accessToken = localStorage.getItem("accessToken");
 
   if (isTokenExpiringSoon(accessToken)) {
-    const refreshToken = localStorage.getItem('refreshToken');
+    const refreshToken = localStorage.getItem("refreshToken");
     const response = await fetch(`${baseUrl}/api/account/refresh-token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({refreshToken: refreshToken})
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken: refreshToken }),
     });
 
     if (response.ok) {
       const data: Data = await response.json();
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
       accessToken = data.accessToken;
-
     } else {
-      console.log("some error...", response)
-      throw new Error('Session expired');
+      throw new Error("Session expired");
     }
   }
 

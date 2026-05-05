@@ -13,6 +13,7 @@ export type UserDto = {
 export type FriendRequestItemProp = {
   request: Requests;
   removeRequest(): void;
+  onRequestProcessed: () => void;
 };
 
 export type Data = {
@@ -52,7 +53,7 @@ export type SpinnerProp = {
 export type AuthData = {
   userName: string;
   email: string;
-  accessToken: string;
+  token: string;
   refreshToken: string;
   userId: string;
 };
@@ -118,4 +119,8 @@ export interface ConversationDto {
 export interface ParticipantDto {
   userId: string;
   userName: string;
+}
+
+export interface LoginRegisterProps{
+  setModal: React.Dispatch<React.SetStateAction<boolean>>
 }

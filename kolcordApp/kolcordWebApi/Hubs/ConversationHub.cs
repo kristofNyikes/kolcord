@@ -22,12 +22,21 @@ public class ConversationHub : Hub
     public async Task SendNewMessage(int conversationId, MessageDto message)
     {
         await Clients.Group($"conv-{conversationId}")
-            .SendAsync("ReceiveMessage", message);
+            .SendAsync("ReceiveMessage", conversationId, message);
     }
 
     public async Task JoinConversationGroup(int conversationId)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, $"conv-{conversationId}");
+    }
+
+    public async Task NotifyConversationUpdated(ConversationDto conversation)
+    {
+        foreach(var participant in conversation.Participants)
+        {
+            await Clients.User(participant.UserId.ToString())
+                .SendAsync("ConversationUpdated", conversation);
+        }
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)

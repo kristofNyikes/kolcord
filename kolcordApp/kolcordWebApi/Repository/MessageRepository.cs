@@ -173,4 +173,12 @@ public class MessageRepository : IMessageRepository
         await _context.SaveChangesAsync();
         return message;
     } 
+
+    public async Task<Conversation?> GetConversation(int conversationId)
+    {
+        var conversation = await _context.Conversations.FindAsync(conversationId);
+        if (conversation == null) return null;
+
+        return conversation;
+    }
 }

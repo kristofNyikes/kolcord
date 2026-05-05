@@ -6,7 +6,6 @@ using kolcordWebApi.Models;
 using kolcordWebApi.Repository;
 using kolcordWebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -19,7 +18,14 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
+        policy.WithOrigins("http://localhost:5173", 
+                "https://localhost:5173", 
+                "http://192.168.1.66:5173", 
+                "https://192.168.1.66:5173", 
+                "http://172.21.192.1:5173", 
+                "https://172.21.192.1:5173", 
+                "http://172.22.240.1:5173", 
+                "https://172.22.240.1:5173")
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials();
