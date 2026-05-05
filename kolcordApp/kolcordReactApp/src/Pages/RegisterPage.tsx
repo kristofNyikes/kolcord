@@ -35,7 +35,7 @@ const RegisterPage = () => {
   };
 
   const handleAuthSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ): Promise<void> => {
     e.preventDefault();
     setIsLoading(true);
@@ -43,7 +43,6 @@ const RegisterPage = () => {
     try {
       const baseUrl = import.meta.env.VITE_BASE_URL;
       const response = await fetch(`${baseUrl}/api/account/register`, options);
-      console.log(response.body);
 
       if (response.ok) {
         const data: AuthData = await response.json();

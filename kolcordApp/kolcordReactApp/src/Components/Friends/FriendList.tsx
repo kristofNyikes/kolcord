@@ -16,6 +16,7 @@ const FriendList = ({ refreshTrigger }: { refreshTrigger?: number }) => {
         accessTokenFactory: async () =>
           localStorage.getItem("accessToken") || "",
       })
+      .configureLogging("warning")
       .withAutomaticReconnect()
       .build();
 
@@ -42,7 +43,7 @@ const FriendList = ({ refreshTrigger }: { refreshTrigger?: number }) => {
     const fetchFriends = async () => {
       const response = await fetchWithTokenCheck(
         "/api/friendship/friend-list",
-        {}
+        {},
       );
       setIsLoading(true);
       if (response.ok) {

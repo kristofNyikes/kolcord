@@ -3,16 +3,7 @@ import { fetchWithTokenCheck } from "../../Helpers/fetchWithTokenRefresh";
 import Spinner from "../Spinner/Spinner";
 import { useNavigate } from "react-router-dom";
 import * as signalR from "@microsoft/signalr";
-import { MessageDto, ConversationDto } from "../../types/types";
-
-// export interface ConversationDto {
-//   id: number;
-//   name: string;
-//   type: "Direct" | "Group" | "Channel";
-//   createdAt: string;
-//   participants: ParticipantDto[];
-//   lastMessage?: MessageDto;
-// }
+import { ConversationDto } from "../../types/types";
 
 const ConversationList = () => {
   const [conversations, setConversations] = useState<ConversationDto[]>([]);
@@ -33,7 +24,6 @@ const ConversationList = () => {
     });
   };
 
-  // --- fetch list on mount ---
   useEffect(() => {
     const load = async () => {
       const res = await fetchWithTokenCheck("/api/conversations", {});
@@ -51,37 +41,25 @@ const ConversationList = () => {
     load();
   }, []);
 
-  // ----------- SignalR for realtime updates -----------
   useEffect(() => {
     const conn = new signalR.HubConnectionBuilder()
       .withUrl(`${apiUrl}/conversationHub`, {
         accessTokenFactory: () => localStorage.getItem("accessToken") || "",
       })
+      .configureLogging("warning")
       .withAutomaticReconnect()
       .build();
 
     conn
       .start()
       .then(() => {
-        console.log("ConversationHub connected");
-
-        // Listen for conversation updates
         conn.on("ConversationUpdated", (updated: ConversationDto) => {
-          console.log("Conversation updated:", updated);
           setConversations((prev) => {
             const filtered = prev.filter((c) => c.id !== updated.id);
             if (!updated.lastMessage) return sortConversations(filtered);
             const newList = [updated, ...filtered];
             return sortConversations(newList);
           });
-        });
-
-        // Also listen for new messages to update conversations
-        conn.on("ReceiveMessage", (message: MessageDto) => {
-          // When a new message arrives, you might want to refetch conversations
-          // or update the specific conversation
-          console.log("New message received:", message);
-          // You could trigger a refetch or update logic here
         });
       })
       .catch((err) => console.error("Hub error:", err));

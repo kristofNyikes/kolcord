@@ -36,7 +36,7 @@ const RegisterModal = ({ setModal }: LoginRegisterProps) => {
   };
 
   const handleAuthSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ): Promise<void> => {
     e.preventDefault();
     setIsLoading(true);
@@ -44,7 +44,6 @@ const RegisterModal = ({ setModal }: LoginRegisterProps) => {
     try {
       const baseUrl = import.meta.env.VITE_BASE_URL;
       const response = await fetch(`${baseUrl}/api/account/register`, options);
-      console.log(response.body);
 
       if (response.ok) {
         const data: AuthData = await response.json();
@@ -56,16 +55,6 @@ const RegisterModal = ({ setModal }: LoginRegisterProps) => {
 
         setSignedIn(true);
         navigate("/main");
-
-        // const loginResponse = await fetch(
-        //   `${baseUrl}/api/account/login`,
-        //   options
-        // );
-
-        // if (loginResponse.ok) {
-        //   setSignedIn(true);
-        //   navigate("/main");
-        // }
       }
     } catch (error) {
       console.error(error);
