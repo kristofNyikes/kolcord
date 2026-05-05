@@ -86,8 +86,21 @@ public class ConversationsController : ControllerBase
             request.ReplyToMessageId
         );
 
+        var conversation = await _repo.GetConversation(conversationId);
+        if (conversation == null) return NotFound("Conversation not found");
+
+        var conversationDto = conversation.FromConversationToDto();
+
+        // Send message to conversation group
         await _hubContext.Clients.Group($"conv-{conversationId}")
             .SendAsync("ReceiveMessage", message);
+
+        // Send conversation update to all participants
+        var participantIds = conversationDto.Participants.Select(p => p.UserId.ToString()).ToList();
+        Console.WriteLine($"Sending ConversationUpdated to users: {string.Join(", ", participantIds)}");
+
+        await _hubContext.Clients.Users(participantIds)
+            .SendAsync("ConversationUpdated", conversationDto);
 
         return Ok(message);
     }

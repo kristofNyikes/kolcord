@@ -12,7 +12,7 @@ using kolcordWebApi.Data;
 namespace kolcordWebApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251102154439_InitialCreate")]
+    [Migration("20260504071559_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
