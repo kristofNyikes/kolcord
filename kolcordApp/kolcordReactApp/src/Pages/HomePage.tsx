@@ -10,10 +10,16 @@ const HomePage = () => {
         <h2 className="text-2xl font-oswald mt-12 md:text-5xl">
           Welcome to Kolcord!
         </h2>
-        <h3 className="text-2xl m-5 md:text-2xl">
-          Wanna join this fantastick app? Just sign up so you can be a part of a
-          fantastic experience
-        </h3>
+        {isOnRegister ? (
+          <h3 className="text-2xl m-5 md:text-2xl">
+            Wanna join this fantastick app? Just sign up so you can be a part of
+            a fantastic experience
+          </h3>
+        ) : (
+          <h3 className="text-2xl m-5 md:text-2xl">
+            Welcome back! Sign in and restart weher you left off
+          </h3>
+        )}
       </div>
 
       {isOnRegister ? (

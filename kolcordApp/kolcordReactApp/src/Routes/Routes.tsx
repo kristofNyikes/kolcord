@@ -5,10 +5,10 @@ import LoginPage from "../Pages/LoginPage";
 import RegisterPage from "../Pages/RegisterPage";
 import MainPage from "../Pages/MainPage";
 import ProtectedRoute from "./ProtectedRoute";
-import FriendList from "../Components/Friends/FriendList";
 import FriendRequests from "../Components/Friends/FriendRequests";
 import Search from "../Components/Search/Search";
 import ConversationPage from "../Pages/ConversationPage";
+import ConversationList from "../Components/Conversation/ConversationList";
 
 export const router = createBrowserRouter([
   {
@@ -26,7 +26,7 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
         children: [
-          { path: "", element: <FriendList /> },
+          { path: "", element: <ConversationList /> },
           { path: "friend-requests", element: <FriendRequests /> },
           { path: "search", element: <Search /> },
           {

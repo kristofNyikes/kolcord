@@ -13,6 +13,7 @@ export type UserDto = {
 export type FriendRequestItemProp = {
   request: Requests;
   removeRequest(): void;
+  onRequestProcessed: () => void;
 };
 
 export type Data = {

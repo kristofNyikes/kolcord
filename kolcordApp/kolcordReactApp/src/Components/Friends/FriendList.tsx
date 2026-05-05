@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
-import { fetchWithTokenCheck } from '../../Helpers/fetchWithTokenRefresh';
-import Spinner from '../Spinner/Spinner';
-import FriendItem from './FriendItem';
-import { Friend } from '../../types/types';
-import * as signalR from '@microsoft/signalr';
+import { useEffect, useState } from "react";
+import { fetchWithTokenCheck } from "../../Helpers/fetchWithTokenRefresh";
+import Spinner from "../Spinner/Spinner";
+import FriendItem from "./FriendItem";
+import { Friend } from "../../types/types";
+import * as signalR from "@microsoft/signalr";
 
-const FriendList = () => {
+const FriendList = ({ refreshTrigger }: { refreshTrigger?: number }) => {
   const [friendList, setFriendList] = useState<Friend[] | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const apiUrl = import.meta.env.VITE_BASE_URL;
@@ -13,33 +13,37 @@ const FriendList = () => {
   useEffect(() => {
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(`${apiUrl}/friendListHub`, {
-        accessTokenFactory: async () => localStorage.getItem('accessToken') || '',
+        accessTokenFactory: async () =>
+          localStorage.getItem("accessToken") || "",
       })
       .withAutomaticReconnect()
       .build();
 
     connection.start().then(() => {
-      connection.on('NewFriendship', (newFriend: Friend) => {
+      connection.on("NewFriendship", (newFriend) => {
         setFriendList((prev) => {
-          if (prev && prev.some((f) => f.id === newFriend.id)) {
-            return prev;
-          }
-          return prev ? [...prev, newFriend] : [newFriend];
+          if (!prev) return [newFriend];
+          if (prev.some((f) => f.id === newFriend.id)) return prev;
+
+          return [...prev, newFriend];
         });
       });
     });
 
     return () => {
-      connection.off('NewFriendship');
+      connection.off("NewFriendship");
       connection.stop();
     };
     //apiUrl is constant from .env
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [refreshTrigger]);
 
   useEffect(() => {
     const fetchFriends = async () => {
-      const response = await fetchWithTokenCheck('/api/friendship/friend-list', {});
+      const response = await fetchWithTokenCheck(
+        "/api/friendship/friend-list",
+        {}
+      );
       setIsLoading(true);
       if (response.ok) {
         const data = await response.json();
@@ -48,7 +52,7 @@ const FriendList = () => {
       }
     };
     fetchFriends();
-  }, []);
+  }, [refreshTrigger]);
 
   return (
     <div className="flex flex-col items-center">
