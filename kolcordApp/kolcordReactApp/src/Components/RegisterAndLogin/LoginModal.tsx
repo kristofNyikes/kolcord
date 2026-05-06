@@ -6,16 +6,27 @@ import { Context } from "../Contexts/Context";
 import Spinner from "../Spinner/Spinner";
 import { Data } from "../../types/types";
 import { LoginRegisterProps } from "../../types/types";
+import { loginChecker } from "../../Helpers/authChecker";
+import ErrorModal from "../Error/ErrorModal";
 
 const LoginModal = ({ setModal }: LoginRegisterProps) => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const context = useContext(Context);
+  const [error, setError] = useState<Response | null>(null);
+  const [errorList, setErrorList] = useState<string[]>([]);
 
   if (!context) {
     throw new Error("Context must be used within a Context.Provider");
   }
+
+  const errorModalTimer = () => {
+    setTimeout(() => {
+      setError(null);
+      setErrorList([]);
+    }, 5000);
+  };
 
   const [, setSignedIn] = context;
   const navigate = useNavigate();
@@ -34,10 +45,18 @@ const LoginModal = ({ setModal }: LoginRegisterProps) => {
   };
 
   const handleAuthSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ): Promise<void> => {
     e.preventDefault();
     setIsLoading(true);
+
+    const errorList = loginChecker(body.email, body.password);
+    if (errorList.length > 0) {
+      setErrorList(errorList);
+      setIsLoading(false);
+      errorModalTimer();
+      return;
+    }
 
     try {
       const baseUrl = import.meta.env.VITE_BASE_URL;
@@ -53,6 +72,13 @@ const LoginModal = ({ setModal }: LoginRegisterProps) => {
 
         setSignedIn(true);
         navigate("/main");
+      } else {
+        const data = await response.json();
+        const errorBody: string[] = [];
+        errorBody[0] = data.error;
+        setError(response);
+        setErrorList(errorBody);
+        errorModalTimer();
       }
     } catch (error) {
       console.error(error);
@@ -65,6 +91,9 @@ const LoginModal = ({ setModal }: LoginRegisterProps) => {
 
   return (
     <div className="flex flex-col justify-center items-center">
+      {errorList.length > 0 && (
+        <ErrorModal error={error} errorList={errorList} />
+      )}
       {!isLoading ? (
         <div>
           <form
