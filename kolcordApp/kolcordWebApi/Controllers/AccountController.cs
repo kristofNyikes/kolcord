@@ -34,6 +34,13 @@ public class AccountController : ControllerBase
             {
                 return BadRequest(ModelState);
             }
+            
+            var user = await  _userManager.Users.SingleOrDefaultAsync(u => u.Email == registerDto.Email);
+
+            if (user != null)
+            {
+                return BadRequest(new {error = "Email already exists"});
+            }
 
             var appUser = new ApplicationUser
             {
@@ -87,14 +94,14 @@ public class AccountController : ControllerBase
         var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == loginReq.Email);
         if (user == null)
         {
-            return Unauthorized("Invalid username or password");
+            return Unauthorized(new {error = "Email or password is incorrect"});
         }
         
         var result = await _sigInManager.PasswordSignInAsync(user, loginReq.Password, false, false);
 
         if (!result.Succeeded)
         {
-            return Unauthorized("Email or password is incorrect");
+            return Unauthorized(new {error = "Email or password is incorrect"});
         }
         
         var refreshToken = GenerateRefreshToken();

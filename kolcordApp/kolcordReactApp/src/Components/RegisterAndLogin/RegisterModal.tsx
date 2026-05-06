@@ -6,14 +6,25 @@ import { Context } from "../Contexts/Context";
 import Spinner from "../Spinner/Spinner";
 import { AuthData } from "../../types/types";
 import { LoginRegisterProps } from "../../types/types";
+import ErrorModal from "../Error/ErrorModal";
+import { registrationChecker } from "../../Helpers/authChecker";
 
 const RegisterModal = ({ setModal }: LoginRegisterProps) => {
   const [username, setUsername] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<Response | null>(null);
+  const [errorList, setErrorList] = useState<string[]>([]);
   const context = useContext(Context);
   const navigate = useNavigate();
+
+  const errorModalTimer = () => {
+    setTimeout(() => {
+      setError(null);
+      setErrorList([]);
+    }, 5000);
+  };
 
   if (!context) {
     throw new Error("Context must be used within a Context.Provider");
@@ -41,6 +52,18 @@ const RegisterModal = ({ setModal }: LoginRegisterProps) => {
     e.preventDefault();
     setIsLoading(true);
 
+    const errorList = registrationChecker(
+      body.email,
+      body.password,
+      body.username,
+    );
+    if (errorList.length > 0) {
+      setErrorList(errorList);
+      setIsLoading(false);
+      errorModalTimer();
+      return;
+    }
+
     try {
       const baseUrl = import.meta.env.VITE_BASE_URL;
       const response = await fetch(`${baseUrl}/api/account/register`, options);
@@ -55,6 +78,13 @@ const RegisterModal = ({ setModal }: LoginRegisterProps) => {
 
         setSignedIn(true);
         navigate("/main");
+      } else {
+        const data = await response.json();
+        const errorBody: string[] = [];
+        errorBody[0] = data.error;
+        setError(response);
+        setErrorList(errorBody);
+        errorModalTimer();
       }
     } catch (error) {
       console.error(error);
@@ -67,6 +97,9 @@ const RegisterModal = ({ setModal }: LoginRegisterProps) => {
 
   return (
     <div className="flex flex-col justify-center items-center">
+      {errorList.length > 0 && (
+        <ErrorModal error={error} errorList={errorList} />
+      )}
       {!isLoading ? (
         <form
           onSubmit={handleAuthSubmit}
