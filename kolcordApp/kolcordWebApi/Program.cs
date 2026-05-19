@@ -132,7 +132,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseCors("ReactApp");
 
@@ -150,38 +150,38 @@ app.MapHub<ConversationHub>("/conversationHub");
 
 app.MapControllers();
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
+
 using(var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+
     try
     {
+        var db = services.GetRequiredService<AppDbContext>();
+        db.Database.Migrate();
+
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-        var adminRoleExists = await roleManager.RoleExistsAsync("Admin");
-        var userRoleExists = await roleManager.RoleExistsAsync("User");
+        string[] roles = { "Admin", "User" };
 
-        if(!adminRoleExists || !userRoleExists)
+        foreach (var role in roles)
         {
-            string[] roleNames = { "Admin", "User" };
-            foreach(var roleName in roleNames)
+            if (!await roleManager.RoleExistsAsync(role))
             {
-                if (!await roleManager.RoleExistsAsync(roleName))
-                {
-                    await roleManager.CreateAsync(new IdentityRole(roleName));
-                    Console.WriteLine($"Created role: {roleName}");
-                }
+                await roleManager.CreateAsync(new IdentityRole(role));
             }
-            Console.WriteLine("Role seeding completed.");
-        } else
-        {
-            Console.WriteLine("Roles already exist. Skipping seeding.");
         }
-    } catch (Exception ex)
+    }
+    catch(Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occured seeding roles.");
+        logger.LogError(ex, "Startup migration/seeding failed");
     }
 }
-
 
 app.Run();
