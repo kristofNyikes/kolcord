@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import { fetchWithTokenCheck } from '../Helpers/fetchWithTokenRefresh';
-import { constants } from '../Helpers/globalConstants';
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
+import { fetchWithTokenCheck } from "../Helpers/fetchWithTokenRefresh";
+import { constants } from "../Helpers/globalConstants";
 
 export const useValidateToken = () => {
   const navigate = useNavigate();
@@ -9,23 +9,27 @@ export const useValidateToken = () => {
   useEffect(() => {
     const validateToken = async () => {
       try {
-        const response = await fetchWithTokenCheck('/api/account/refresh-token-expiration', {});
+        const response = await fetchWithTokenCheck(
+          "/api/account/refresh-token-expiration",
+          {},
+        );
         if (response.ok) {
           const data = await response.json();
-          const expiration = new Date(data.expiration).getTime() / constants.secInMiliSec;
+          const expiration =
+            new Date(data.expiration).getTime() / constants.secInMiliSec;
           const now = Math.floor(Date.now() / constants.secInMiliSec);
 
           if (expiration < now) {
-            navigate('/login');
+            navigate("/");
             localStorage.clear();
           }
         } else if (response.status === 401) {
-          navigate('/login');
+          navigate("/");
           localStorage.clear();
         }
       } catch (error) {
-        console.error('Token validation failed:', error);
-        navigate('/login');
+        console.error("Token validation failed:", error);
+        navigate("/");
         localStorage.clear();
       }
     };
