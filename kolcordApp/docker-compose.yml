@@ -3,44 +3,39 @@ services:
     image: postgres:16
     container_name: kolcord_postgres
     restart: unless-stopped
-
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: kolcorddb
-
     ports:
-      - "5432:5432"
-
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   backend:
     build:
       context: ./kolcordWebApi
-
     container_name: kolcord_backend
-
     ports:
       - "8080:8080"
-
     depends_on:
-      - postgres
-
+      postgres:
+        condition: service_healthy
     environment:
-      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=kolcorddb;Username=postgres;Password=password
-    
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=kolcorddb;Username=postgres;Password=password
     restart: unless-stopped
 
   frontend:
     build:
       context: ./kolcordReactApp
-
     container_name: kolcord_frontend
-
     ports:
       - "5173:5173"
-
     depends_on:
       - backend
 
