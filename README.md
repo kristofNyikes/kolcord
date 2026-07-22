@@ -1,6 +1,10 @@
 # Kolcord
 
-**Rizzy** is a modern dating application designed to connect people meaningfully. Built with cutting-edge technologies, it provides a seamless experience for users to find matches, chat, and build connections. The app features a C# ASP.NET backend, an Entity Framework-powered database, and a React-based frontend.
+![Kolcord Banner](./README/Images/homepage.png)
+
+![Kolcord Chat Interface](./README/Images/chat.png)
+
+**Kolcord** is a modern chat application designed to connect people meaningfully. Built with cutting-edge technologies, it provides a seamless experience for users to find friends, chat, and build connections. The app features a C# ASP.NET backend, an Entity Framework-powered database, and a React-based frontend.
 
 ## Features
 
@@ -79,7 +83,13 @@
    ```
 2. **Docker setup**:
 
-- Run the docker-compose.yml file in the terminal with the `docker compose up` command to create the application in Docker.
+- Create a .env.docker file with the following content:
+
+  ```bash
+  VITE_BASE_URL=http://localhost:8080
+  ```
+
+- Run the docker-compose.yml file in `/kolcordApp` in the terminal with the `docker compose up --build` command to create the application in Docker.
 - Docker compose runs the entire server, frontend and database.
 
 3. **Access the app**:
@@ -124,6 +134,10 @@
   ```bash
   npm install
   ```
+- Create .env file:
+  ```bash
+  VITE_BASE_URL=http://localhost:8080
+  ```
 - Start the React development server:
   ```bash
   npm run dev
@@ -131,6 +145,18 @@
 
 4. **Access the app**:
    Open your browser and navigate to `http://localhost:5173/`.
+
+---
+
+## Environment Variables
+
+### Backend
+
+- `ConnectionStrings__DefaultConnection`: PostgreSQL connection string
+
+### Frontend
+
+- `VITE_BASE_URL`: API base URL (use `http://localhost:8080` )
 
 ---
 
